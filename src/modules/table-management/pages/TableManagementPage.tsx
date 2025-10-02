@@ -30,6 +30,21 @@ const mockTables: Table[] = Array.from({ length: 24 }, (_, i) => ({
   floor: 1,
 }));
 
+const PageContainer = styled.div`
+  padding: 24px;
+`;
+
+const PageHeader = styled.div`
+  margin-bottom: 24px;
+`;
+
+const PageTitle = styled.h1`
+  font-size: 24px;
+  font-weight: 600;
+  color: #262626;
+  margin: 0;
+`;
+
 const TableManagementPage: React.FC = () => {
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [activeTab, setActiveTab] = useState('1');
@@ -40,8 +55,10 @@ const TableManagementPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Table Management</h1>
+    <PageContainer>
+      <PageHeader>
+        <PageTitle>Quản lý bàn</PageTitle>
+      </PageHeader>
       
       <Row gutter={16}>
         <Col span={16}>
@@ -93,7 +110,7 @@ const TableManagementPage: React.FC = () => {
           </Card>
         </Col>
       </Row>
-    </div>
+    </PageContainer>
   );
 };
 

@@ -63,13 +63,30 @@ const columns = [
   },
 ];
 
+const PageContainer = styled.div`
+  padding: 24px;
+`;
+
+const PageHeader = styled.div`
+  margin-bottom: 24px;
+`;
+
+const PageTitle = styled.h1`
+  font-size: 24px;
+  font-weight: 600;
+  color: #262626;
+  margin: 0 0 16px 0;
+`;
+
 const OrderHistoryPage: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [dateRange, setDateRange] = useState<[Date, Date] | null>(null);
 
   return (
-    <div>
-      <h1>Lịch sử đơn hàng</h1>
+    <PageContainer>
+      <PageHeader>
+        <PageTitle>Lịch sử đơn hàng</PageTitle>
+      </PageHeader>
       
       <Space style={{ marginBottom: 16 }}>
         <Input
@@ -90,7 +107,7 @@ const OrderHistoryPage: React.FC = () => {
         dataSource={mockOrders} 
         pagination={{ pageSize: 8 }}
       />
-    </div>
+    </PageContainer>
   );
 };
 
