@@ -1,4 +1,243 @@
-# Getting Started with Create React App
+# 🍽️ Restaurant Management System
+
+Hệ thống quản lý nhà hàng hiện đại với React + TypeScript + Ant Design
+
+[![React](https://img.shields.io/badge/React-19.1.1-blue.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-blue.svg)](https://www.typescriptlang.org/)
+[![Ant Design](https://img.shields.io/badge/Ant%20Design-5.27.4-blue.svg)](https://ant.design/)
+
+---
+
+## 📋 Mục lục
+
+- [Tính năng](#-tính-năng)
+- [Demo](#-demo)
+- [Cài đặt](#-cài-đặt)
+- [Cấu trúc dự án](#-cấu-trúc-dự-án)
+- [Documentation](#-documentation)
+- [Tech Stack](#-tech-stack)
+- [Scripts](#-scripts)
+
+---
+
+## ✨ Tính năng
+
+### ✅ Đã hoàn thành:
+- 🎨 **Dashboard** - Thống kê doanh thu, nhập/xuất kho, biểu đồ
+- 🪑 **Quản lý bàn** - Theo dõi trạng thái bàn, sắp xếp theo tầng
+- 🍽️ **Menu** - Hiển thị món ăn, filter theo category, search
+- 🛒 **Order** - Thêm món, điều chỉnh số lượng, tính tổng tiền
+- 💳 **Payment** - 3 phương thức (Tiền mặt, Thẻ, Chuyển khoản)
+- 🎯 **Modern UI** - Theo thiết kế Figma, responsive, horizontal scroll
+
+### 🔄 Đang phát triển:
+- 📄 Payment Receipt - In hóa đơn
+- 📊 Order History - Lịch sử đơn hàng
+- 👥 User Management - Quản lý nhân viên
+
+---
+
+## 🖼️ Demo
+
+### Dashboard
+![Dashboard](docs/images/dashboard.png)
+
+### Menu (Figma Design)
+![Menu](docs/images/menu-design.png)
+
+### Table Management
+![Tables](docs/images/tables.png)
+
+---
+
+## 🚀 Cài đặt
+
+### Yêu cầu:
+- Node.js >= 14
+- npm hoặc yarn
+
+### Bước 1: Clone project
+```bash
+git clone https://github.com/thanhtungt/restaurant-management-system.git
+cd restaurant-management-system
+```
+
+### Bước 2: Cài đặt dependencies
+```bash
+npm install
+```
+
+### Bước 3: Chạy development server
+```bash
+npm start
+```
+
+Mở [http://localhost:3000](http://localhost:3000) để xem ứng dụng.
+
+---
+
+## 📂 Cấu trúc dự án
+
+```
+src/
+├── modules/
+│   ├── menu/              # Menu module
+│   │   ├── components/    # MenuItems, MenuItemCard, CategoryFilter
+│   │   ├── hooks/         # useMenu (state management)
+│   │   ├── services/      # API calls
+│   │   └── pages/         # MenuPage
+│   ├── order/             # Order module
+│   │   ├── components/    # OrderDetails, OrderItemComponent
+│   │   ├── hooks/         # useOrder (cart management)
+│   │   └── services/      # orderService
+│   ├── payment/           # Payment module
+│   │   ├── components/    # PaymentModal
+│   │   └── services/      # paymentService
+│   ├── table-management/  # Table management
+│   │   ├── components/
+│   │   ├── pages/         # TableManagementPage (main)
+│   │   └── services/      # tableService
+│   ├── dashboard/         # Dashboard
+│   │   └── pages/         # DashboardPage
+│   └── auth/              # Authentication
+│       └── pages/         # LoginPage
+├── services/
+│   └── apiService.ts      # ⭐ Mock data & API handler
+├── types/                 # TypeScript interfaces
+├── config/                # Configuration
+├── routes/                # React Router setup
+└── components/            # Shared components
+
+public/
+└── menu/                  # ⭐ Menu images
+```
+
+---
+
+## 📚 Documentation
+
+Đầy đủ tài liệu trong folder gốc:
+
+### 🎯 Bắt đầu nhanh:
+- **[INDEX.md](INDEX.md)** - Danh mục tất cả tài liệu
+- **[MENU_LOCATION_SUMMARY.md](MENU_LOCATION_SUMMARY.md)** ⭐ - Món ăn nằm ở đâu?
+- **[MENU_DATA_QUICK_GUIDE.md](MENU_DATA_QUICK_GUIDE.md)** ⚡ - Thêm món ăn trong 3 bước
+
+### 📖 Chi tiết:
+- **[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)** - Kế hoạch phát triển
+- **[COMPLETED_MODULES.md](COMPLETED_MODULES.md)** - Đã hoàn thành
+- **[MENU_DESIGN_UPDATE.md](MENU_DESIGN_UPDATE.md)** - UI/UX design specs
+- **[WHERE_ARE_MENU_DATA.md](WHERE_ARE_MENU_DATA.md)** - Chi tiết data structure
+- **[MENU_FLOW_DIAGRAM.md](MENU_FLOW_DIAGRAM.md)** - Sơ đồ luồng dữ liệu
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend:
+- **React** 19.1.1 - UI framework
+- **TypeScript** 4.9.5 - Type safety
+- **Ant Design** 5.27.4 - UI component library
+- **Recharts** 2.12.0 - Charts & graphs
+- **React Router** 7.9.3 - Routing
+
+### State Management:
+- Custom hooks (useMenu, useOrder)
+- React Context (AuthContext)
+
+### API:
+- Mock data (development)
+- RESTful API endpoints (production ready)
+
+---
+
+## 📜 Scripts
+
+### Development
+```bash
+npm start          # Chạy dev server (port 3000)
+npm test           # Chạy tests
+```
+
+### Production
+```bash
+npm run build      # Build production
+npm run eject      # Eject CRA config (không khuyến khích)
+```
+
+### Code Quality
+```bash
+npm run lint       # Lint code
+npm run format     # Format code
+```
+
+---
+
+## 🎨 Thêm món ăn mới
+
+### Bước 1: Edit mock data
+File: `src/services/apiService.ts` (dòng ~85)
+
+```javascript
+if (url.includes(API_ENDPOINTS.menu)) {
+  return {
+    data: [
+      // ... món cũ ...
+      
+      // THÊM MỚI
+      {
+        id: 'mon-moi',
+        name: 'Tên món ăn',
+        price: 450000,              // 450000 = GNF 4500.00
+        image: '/menu/mon-moi.jpg',
+        category: 'donhau',
+        description: 'Mô tả món',
+      },
+    ]
+  };
+}
+```
+
+### Bước 2: Thêm hình ảnh
+Đặt file vào: `public/menu/mon-moi.jpg`
+
+### Bước 3: Restart server
+```bash
+npm start
+```
+
+Chi tiết xem: [MENU_DATA_QUICK_GUIDE.md](MENU_DATA_QUICK_GUIDE.md)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) for development guidelines.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 👨‍💻 Author
+
+**thanhtungt**  
+GitHub: [@thanhtungt](https://github.com/thanhtungt)
+
+---
+
+## 🙏 Acknowledgments
+
+- Design inspired by modern POS systems
+- UI components from [Ant Design](https://ant.design/)
+- Icons from [Ant Design Icons](https://ant.design/components/icon/)
+
+---
+
+**🎉 Happy coding!**
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

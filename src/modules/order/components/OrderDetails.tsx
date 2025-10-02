@@ -1,248 +1,387 @@
-import React, { useState } from 'react';
-import { Button, List, Space, Modal, Select, Input, Tag } from 'antd';
-import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import { Button, Empty, Divider, Space } from 'antd';
+import { ShoppingCartOutlined, ClearOutlined, PrinterOutlined, CalendarOutlined, ClockCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Table } from '../../../types/table';
-
-interface OrderItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-}
-
-const { Option } = Select;
-
-const OrderCard = styled.div`
-  padding: 16px;
-  border-radius: 4px;
-  background-color: #fff;
-`;
-
-const OrderHeader = styled.div`
-  margin-bottom: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const OrderTitle = styled.h2`
-  margin: 0;
-`;
-
-const OrderInfo = styled.div`
-  margin-bottom: 16px;
-`;
-
-const OrderInfoItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-`;
-
-const OrderTotal = styled.div`
-  font-weight: bold;
-  color: #52c41a;
-  font-size: 18px;
-  text-align: right;
-  margin-top: 16px;
-`;
-
-const TableInfo = styled.div`
-  margin-bottom: 16px;
-`;
-
-// Không dùng styled-component cho List vì có vấn đề với generic types
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 16px;
-  gap: 8px;
-`;
-
-const ActionButton = styled(Button)`
-  flex: 1;
-`;
+import { OrderItem } from '../../../types/order';
+import OrderItemComponent from './OrderItemComponent';
 
 interface OrderDetailsProps {
   table: Table | null;
+  items: OrderItem[];
+  total: number;
+  itemsCount: number;
+  selectedFloor?: string;
+  onUpdateQuantity: (menuItemId: string, quantity: number) => void;
+  onRemoveItem: (menuItemId: string) => void;
+  onClearOrder: () => void;
+  onPayment: () => void;
 }
 
-const OrderDetails: React.FC<OrderDetailsProps> = ({ table }) => {
-  const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('cash');
-  
-  const mockOrderItems: OrderItem[] = [
-    {
-      id: '1',
-      name: 'Salad Tuna',
-      price: 200000,
-      quantity: 2,
-    },
-    {
-      id: '2',
-      name: 'Wagyu Black Paper',
-      price: 200000,
-      quantity: 1,
-    },
-    {
-      id: '3',
-      name: 'Salad Egg',
-      price: 200000,
-      quantity: 1,
-    }
-  ];
-  
-  const totalAmount = mockOrderItems.reduce(
-    (sum, item) => sum + item.price * item.quantity, 
-    0
-  );
-  
-  const handlePaymentModalOpen = () => {
-    setIsPaymentModalVisible(true);
+const OrderDetails: React.FC<OrderDetailsProps> = ({
+  table,
+  items,
+  total,
+  itemsCount,
+  selectedFloor = '1',
+  onUpdateQuantity,
+  onRemoveItem,
+  onClearOrder,
+  onPayment,
+}) => {
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
-  
-  const handlePaymentModalCancel = () => {
-    setIsPaymentModalVisible(false);
+
+  const formatTime = (date: Date) => {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
   };
-  
-  const handlePayment = () => {
-    // Process payment
-    setIsPaymentModalVisible(false);
-  };
-  
-  if (!table) {
+
+  // No table selected OR no items - show same layout
+  if (!table || items.length === 0) {
     return (
-      <OrderCard>
-        <p>Vui lòng chọn bàn để xem đơn hàng</p>
-      </OrderCard>
-    );
-  }
-  
-  return (
-    <>
-      <OrderCard>
-        <OrderHeader>
-          <OrderTitle>Đơn hàng</OrderTitle>
-          <Button type="link">Đơn hàng trước đó →</Button>
-        </OrderHeader>
-        
-        <TableInfo>
-          <OrderInfoItem>
-            <span>Ngày tạo đơn:</span>
-            <span>19/08/2025</span>
-          </OrderInfoItem>
-          <OrderInfoItem>
-            <span>Thời điểm:</span>
-            <span>20:20:45</span>
-          </OrderInfoItem>
-          <OrderInfoItem>
-            <span>Khách hàng:</span>
-            <span>Nguyễn Văn A</span>
-          </OrderInfoItem>
-          <OrderInfoItem>
-            <span>Thu ngân:</span>
-            <span>Lê Thị C</span>
-          </OrderInfoItem>
-          <OrderInfoItem>
-            <span>Nhân viên:</span>
-            <span>Trần Văn B</span>
-          </OrderInfoItem>
-          <OrderInfoItem>
-            <span>Bàn:</span>
-            <Tag color="blue">{table.number}</Tag>
-          </OrderInfoItem>
-        </TableInfo>
-        
-        <List<OrderItem>
-          style={{ marginBottom: '16px' }}
-          dataSource={mockOrderItems}
-          renderItem={(item) => (
-            <List.Item
-              actions={[
-                <Space>
-                  <Button 
-                    icon={<MinusOutlined />} 
-                    size="small" 
-                  />
-                  <span>{item.quantity}</span>
-                  <Button 
-                    icon={<PlusOutlined />} 
-                    size="small"
-                  />
-                </Space>
-              ]}
-            >
-              <List.Item.Meta
-                title={item.name}
-                description={`${item.price.toLocaleString()}đ`}
-              />
-              <div>{(item.price * item.quantity).toLocaleString()}đ</div>
-            </List.Item>
-          )}
-        />
-        
-        <OrderInfoItem>
-          <span>Tạm tính:</span>
-          <span>{totalAmount.toLocaleString()}đ</span>
-        </OrderInfoItem>
-        <OrderInfoItem>
-          <span>Giảm giá:</span>
-          <span>0đ</span>
-        </OrderInfoItem>
-        
-        <OrderTotal>
-          Tổng: {totalAmount.toLocaleString()}đ
-        </OrderTotal>
-        
-        <ButtonGroup>
-          <ActionButton>Lưu</ActionButton>
-          <ActionButton type="primary" onClick={handlePaymentModalOpen}>
-            Thanh toán
-          </ActionButton>
-        </ButtonGroup>
-      </OrderCard>
-      
-      <Modal
-        title="Thanh toán"
-        open={isPaymentModalVisible}
-        onCancel={handlePaymentModalCancel}
-        footer={[
-          <Button key="back" onClick={handlePaymentModalCancel}>
-            Hủy
-          </Button>,
-          <Button key="submit" type="primary" onClick={handlePayment}>
-            Tiếp tục
-          </Button>,
-        ]}
-      >
-        <div>
-          <p>Vui lòng chọn phương thức thanh toán:</p>
-          <Select
-            style={{ width: '100%', marginBottom: 16 }}
-            value={paymentMethod}
-            onChange={value => setPaymentMethod(value)}
-          >
-            <Option value="cash">Tiền mặt</Option>
-            <Option value="transfer">Chuyển khoản</Option>
-          </Select>
-          
-          {paymentMethod === 'transfer' && (
-            <div>
-              <p>Vui lòng quét mã để thanh toán:</p>
-              <div style={{ textAlign: 'center', padding: 16 }}>
-                <p>Mã QR ở đây</p>
-              </div>
+      <div style={{ 
+        height: '100%', 
+        background: '#f0f0f0',
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      }}>
+        {/* Top Section: Date/Time Box & Previous Orders Box */}
+        <div style={{ display: 'flex', gap: '16px' }}>
+          {/* Date & Time Box - Combined */}
+          <div style={{
+            padding: '16px 20px',
+            background: '#fff',
+            borderRadius: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <CalendarOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+              <span style={{ fontSize: '15px', fontWeight: '500', color: '#262626' }}>
+                {formatDate(currentTime)}
+              </span>
             </div>
-          )}
-          
-          <div style={{ textAlign: 'right', marginTop: 16 }}>
-            <span>Tổng: {totalAmount.toLocaleString()}đ</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <ClockCircleOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+              <span style={{ fontSize: '15px', fontWeight: '500', color: '#262626' }}>
+                {formatTime(currentTime)}
+              </span>
+            </div>
+          </div>
+
+          {/* Previous Orders Box */}
+          <div style={{
+            flex: 1,
+            padding: '16px 20px',
+            background: '#fff',
+            borderRadius: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+            cursor: 'pointer',
+          }}>
+            <ArrowLeftOutlined style={{ fontSize: '18px', color: '#262626' }} />
+            <span style={{ 
+              fontSize: '16px', 
+              fontWeight: '600',
+              color: '#262626',
+            }}>
+              Đơn hàng trước đó
+            </span>
           </div>
         </div>
-      </Modal>
-    </>
+
+        {/* Main Card */}
+        <div style={{ 
+          flex: 1,
+          background: '#fff',
+          borderRadius: '16px',
+          padding: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+        }}>
+          {/* Empty State */}
+          <div style={{ 
+            flex: 1,
+            display: 'flex', 
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <h2 style={{ 
+              margin: '0 0 8px 0', 
+              fontSize: '20px', 
+              fontWeight: '600',
+              color: '#262626',
+            }}>
+              Đơn hàng
+            </h2>
+            <p style={{
+              margin: 0,
+              fontSize: '14px',
+              color: '#8c8c8c',
+              textAlign: 'center',
+            }}>
+              Vui lòng chọn bàn để bắt đầu tạo đơn hàng
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Has items
+  return (
+    <div style={{ 
+      height: '100%', 
+      background: '#f0f0f0',
+      padding: '20px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '16px',
+    }}>
+      {/* Top Section: Date/Time Box & Previous Orders Box */}
+      <div style={{ display: 'flex', gap: '16px' }}>
+        {/* Date & Time Box - Combined */}
+        <div style={{
+          padding: '16px 20px',
+          background: '#fff',
+          borderRadius: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <CalendarOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+            <span style={{ fontSize: '15px', fontWeight: '500', color: '#262626' }}>
+              {formatDate(currentTime)}
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <ClockCircleOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+            <span style={{ fontSize: '15px', fontWeight: '500', color: '#262626' }}>
+              {formatTime(currentTime)}
+            </span>
+          </div>
+        </div>
+
+        {/* Previous Orders Box */}
+        <div style={{
+          flex: 1,
+          padding: '16px 20px',
+          background: '#fff',
+          borderRadius: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          cursor: 'pointer',
+        }}>
+          <ArrowLeftOutlined style={{ fontSize: '18px', color: '#262626' }} />
+          <span style={{ 
+            fontSize: '16px', 
+            fontWeight: '600',
+            color: '#262626',
+          }}>
+            Đơn hàng trước đó
+          </span>
+        </div>
+      </div>
+
+      {/* Main Card */}
+      <div style={{ 
+        flex: 1,
+        background: '#fff',
+        borderRadius: '16px',
+        padding: '24px',
+        display: 'flex',
+        flexDirection: 'column',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+      }}>
+        {/* Header Title */}
+        <h2 style={{ 
+          margin: '0 0 20px 0',
+          fontSize: '24px',
+          fontWeight: '700',
+          color: '#262626',
+          textAlign: 'center',
+        }}>
+          Đơn hàng
+        </h2>
+
+        {/* Order Info Box */}
+        <div style={{
+          padding: '16px',
+          background: '#fafafa',
+          borderRadius: '12px',
+          border: '1px dashed #d9d9d9',
+          marginBottom: '20px',
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Ngày tạo đơn:</span>
+              <span style={{ fontSize: '14px', fontWeight: '500', color: '#262626' }}>{formatDate(currentTime)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Thời điểm:</span>
+              <span style={{ fontSize: '14px', fontWeight: '500', color: '#262626' }}>{formatTime(currentTime)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Khách hàng:</span>
+              <span style={{ fontSize: '14px', fontWeight: '500', color: '#262626' }}>Lê Thị C</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Nhân viên:</span>
+              <span style={{ fontSize: '14px', fontWeight: '500', color: '#262626' }}>Trần Văn B</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Bàn:</span>
+              <span style={{ 
+                padding: '4px 12px',
+                background: '#1890ff',
+                color: '#fff',
+                borderRadius: '12px',
+                fontSize: '13px',
+                fontWeight: '600',
+              }}>
+                {table.number} Tầng {selectedFloor}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Items List */}
+        <div style={{ flex: 1, overflowY: 'auto', marginBottom: '16px' }}>
+          {items.map((item) => (
+            <OrderItemComponent
+              key={item.menuItem.id}
+              item={item}
+              onUpdateQuantity={onUpdateQuantity}
+              onRemove={onRemoveItem}
+            />
+          ))}
+        </div>
+
+        {/* Total Section */}
+        <div style={{ 
+          padding: '16px',
+          background: '#fafafa',
+          borderRadius: '12px',
+          marginBottom: '16px',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Tạm tính:</span>
+            <span style={{ fontSize: '16px', fontWeight: '600', color: '#1890ff' }}>
+              {total.toLocaleString('vi-VN')}₫
+            </span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Giảm giá:</span>
+            <span style={{ fontSize: '16px', fontWeight: '600', color: '#ff4d4f' }}>
+              XVYZ6H
+            </span>
+          </div>
+          <Divider style={{ margin: '12px 0' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '16px', fontWeight: '700', color: '#262626' }}>Tổng:</span>
+            <span style={{ fontSize: '24px', fontWeight: '700', color: '#52c41a' }}>
+              {total.toLocaleString('vi-VN')}₫
+            </span>
+          </div>
+          <div style={{ marginTop: '8px', fontSize: '13px', color: '#8c8c8c' }}>
+            <span style={{ fontWeight: '600' }}>Phương thức thanh toán:</span> chưa có
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+          <Button
+            size="large"
+            block
+            style={{
+              height: '48px',
+              fontSize: '15px',
+              fontWeight: '600',
+              borderRadius: '8px',
+            }}
+          >
+            Lưu
+          </Button>
+          <Button
+            size="large"
+            block
+            style={{
+              height: '48px',
+              fontSize: '15px',
+              fontWeight: '600',
+              borderRadius: '8px',
+            }}
+          >
+            Hủy
+          </Button>
+        </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <Button
+            size="large"
+            block
+            icon={<PrinterOutlined />}
+            style={{
+              height: '48px',
+              fontSize: '15px',
+              fontWeight: '600',
+              background: '#52c41a',
+              borderColor: '#52c41a',
+              color: '#fff',
+              borderRadius: '8px',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#73d13d'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#52c41a'}
+          >
+            Xuất hóa đơn
+          </Button>
+          <Button
+            type="primary"
+            size="large"
+            block
+            onClick={onPayment}
+            danger
+            style={{
+              height: '48px',
+              fontSize: '15px',
+              fontWeight: '600',
+              borderRadius: '8px',
+            }}
+          >
+            Thanh Toán
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 
