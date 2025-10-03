@@ -90,6 +90,14 @@ export const useOrder = (tableId?: string) => {
     message.success('Đã xóa tất cả món');
   };
 
+  // Load order from history
+  const loadOrderFromHistory = (order: Order) => {
+    setOrderItems(order.items);
+    setCurrentOrder(order);
+    setNotes(order.notes || '');
+    message.success(`Đã tải đơn hàng ${order.orderNumber}`);
+  };
+
   // Submit order to API
   const submitOrder = async (): Promise<Order | null> => {
     if (orderItems.length === 0) {
@@ -185,6 +193,7 @@ export const useOrder = (tableId?: string) => {
     clearOrder,
     submitOrder,
     updateOrder,
+    loadOrderFromHistory,
   };
 };
 

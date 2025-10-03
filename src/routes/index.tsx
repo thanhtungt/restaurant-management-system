@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import DashboardPage from '../modules/dashboard/pages/DashboardPage';
 import TableManagementPage from '../modules/table-management/pages/TableManagementPage';
-import OrderHistoryPage from '../modules/order/pages/OrderHistoryPage';
 import LoginPage from '../modules/auth/pages/LoginPage';
 import MainLayout from '../layouts/MainLayout';
 import PrivateRoute from '../components/PrivateRoute';
@@ -37,7 +36,6 @@ const AppRoutes: React.FC = () => {
             
             {/* Common routes for both admin and waiter */}
             <Route path="tables" element={<TableManagementPage />} />
-            <Route path="orders/history" element={<OrderHistoryPage />} />
           </Route>
         </Route>
         

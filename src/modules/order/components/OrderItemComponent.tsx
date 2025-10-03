@@ -38,100 +38,149 @@ const OrderItemComponent: React.FC<OrderItemComponentProps> = ({
         display: 'flex',
         alignItems: 'center',
         padding: '12px 0',
-        borderBottom: '1px solid #f0f0f0',
+        gap: '12px',
       }}
     >
-      {/* Item info */}
-      <div style={{ flex: 1, marginRight: '12px' }}>
-        <div
-          style={{
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#262626',
-            marginBottom: '4px',
-          }}
-        >
-          {item.menuItem.name}
-        </div>
-        <div style={{ fontSize: '13px', color: '#8c8c8c' }}>
-          {item.menuItem.price.toLocaleString('vi-VN')}₫
-        </div>
-      </div>
-
-      {/* Quantity controls */}
+      {/* Item Image */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          marginRight: '12px',
+          width: '60px',
+          height: '60px',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          flexShrink: 0,
+          background: '#f0f0f0',
         }}
       >
-        <Button
-          type="text"
-          size="small"
-          icon={<MinusOutlined />}
-          onClick={handleDecrease}
-          disabled={item.quantity <= 1}
+        {item.menuItem.image ? (
+          <img
+            src={item.menuItem.image}
+            alt={item.menuItem.name}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '24px',
+              color: '#d9d9d9',
+            }}
+          >
+            🍽️
+          </div>
+        )}
+      </div>
+
+      {/* Item info and Quantity controls */}
+      <div style={{ flex: 1 }}>
+        <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            width: '24px',
-            height: '24px',
+            marginBottom: '8px',
+            gap: '8px',
           }}
-        />
-        <InputNumber
-          min={1}
-          max={99}
-          value={item.quantity}
-          onChange={handleQuantityChange}
-          size="small"
-          style={{ width: '50px' }}
-          controls={false}
-        />
-        <Button
-          type="text"
-          size="small"
-          icon={<PlusOutlined />}
-          onClick={handleIncrease}
+        >
+          <span style={{
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#262626',
+          }}>
+            {item.menuItem.name}
+          </span>
+          <span style={{
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#262626',
+          }}>
+            -
+          </span>
+          <span style={{ 
+            fontSize: '13px', 
+            fontWeight: '600',
+            color: '#ff8800',
+          }}>
+            {item.menuItem.price.toLocaleString('vi-VN')}₫
+          </span>
+        </div>
+        
+        {/* Quantity controls under item name */}
+        <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            width: '24px',
-            height: '24px',
+            gap: '6px',
           }}
-        />
+        >
+          <Button
+            type="primary"
+            size="small"
+            icon={<MinusOutlined style={{ fontSize: '8px' }} />}
+            onClick={handleDecrease}
+            disabled={item.quantity <= 1}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '22px',
+              height: '22px',
+              borderRadius: '50%',
+              padding: 0,
+              background: '#1890ff',
+              borderColor: '#1890ff',
+            }}
+          />
+          <span
+            style={{
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#262626',
+              minWidth: '20px',
+              textAlign: 'center',
+            }}
+          >
+            {item.quantity}
+          </span>
+          <Button
+            type="primary"
+            size="small"
+            icon={<PlusOutlined style={{ fontSize: '8px' }} />}
+            onClick={handleIncrease}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '22px',
+              height: '22px',
+              borderRadius: '50%',
+              padding: 0,
+              background: '#1890ff',
+              borderColor: '#1890ff',
+            }}
+          />
+        </div>
       </div>
 
       {/* Subtotal */}
       <div
         style={{
-          fontSize: '14px',
+          fontSize: '16px',
           fontWeight: '600',
-          color: '#1890ff',
-          minWidth: '80px',
+          color: '#0088FF',
+          minWidth: '90px',
           textAlign: 'right',
-          marginRight: '12px',
         }}
       >
         {subtotal.toLocaleString('vi-VN')}₫
       </div>
-
-      {/* Delete button */}
-      <Button
-        type="text"
-        danger
-        size="small"
-        icon={<DeleteOutlined />}
-        onClick={() => onRemove(item.menuItem.id)}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      />
     </div>
   );
 };

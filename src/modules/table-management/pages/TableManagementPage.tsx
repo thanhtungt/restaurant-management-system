@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Card, Row, Col, Button, Space, Badge, Select, Input } from 'antd';
-import { SearchOutlined, LeftOutlined } from '@ant-design/icons';
+import { SearchOutlined, LeftOutlined, CalendarOutlined, ClockCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Table } from '../../../types/table';
+import { Order } from '../../../types/order';
 import MenuItems from '../../menu/components/MenuItems';
 import MenuCategoryFilter from '../../menu/components/MenuCategoryFilter';
 import OrderDetails from '../../order/components/OrderDetails';
+import OrderHistorySidebar from '../../order/components/OrderHistorySidebar';
 import PaymentModal from '../../payment/components/PaymentModal';
 import useMenu from '../../menu/hooks/useMenu';
 import useOrder from '../../order/hooks/useOrder';
@@ -16,6 +18,8 @@ const TableManagementPage: React.FC = () => {
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [selectedFloor, setSelectedFloor] = useState('1');
   const [paymentModalVisible, setPaymentModalVisible] = useState(false);
+  const [orderHistorySidebarVisible, setOrderHistorySidebarVisible] = useState(false);
+  const [selectedHistoryOrder, setSelectedHistoryOrder] = useState<Order | null>(null);
   
   // Use custom hooks
   const menuState = useMenu();
@@ -30,6 +34,20 @@ const TableManagementPage: React.FC = () => {
     // Payment will be handled by PaymentModal
     setPaymentModalVisible(false);
     orderState.clearOrder();
+  };
+
+  const handleSelectHistoryOrder = (order: Order) => {
+    setSelectedHistoryOrder(order);
+    
+    // Find and select the table from the order
+    const orderTable = tables.find(t => t.id === order.tableId);
+    if (orderTable) {
+      setSelectedTable(orderTable);
+    }
+    
+    // Load order items to OrderDetails
+    orderState.loadOrderFromHistory(order);
+    setOrderHistorySidebarVisible(false);
   };
 
   const getTableStyle = (table: Table) => {
@@ -172,7 +190,7 @@ const TableManagementPage: React.FC = () => {
           {/* Tables Section */}
           <Card 
             style={{ 
-              borderRadius: '16px',
+              borderRadius: '20px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
             }}
             bodyStyle={{ padding: '24px' }}
@@ -322,11 +340,60 @@ const TableManagementPage: React.FC = () => {
         
         {/* Right Column - Order Details */}
         <Col span={8}>
-          <Card 
-            style={{ 
+          {/* Date/Time and Previous Orders Section */}
+          <div style={{ marginBottom: '16px', display: 'flex', gap: '12px' }}>
+            {/* Date & Time Box */}
+            <Card style={{
               borderRadius: '12px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              minHeight: '600px'
+            }} bodyStyle={{ padding: '12px 16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <CalendarOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
+                <span style={{ fontSize: '14px', fontWeight: '500' }}>
+                  {new Date().toLocaleDateString('vi-VN')}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ClockCircleOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
+                <span style={{ fontSize: '14px', fontWeight: '500' }}>
+                  {new Date().toLocaleTimeString('vi-VN')}
+                </span>
+              </div>
+            </Card>
+
+            {/* Previous Orders Button */}
+            <Card style={{
+              flex: 1,
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              cursor: 'pointer',
+            }}
+            onClick={() => setOrderHistorySidebarVisible(true)}
+            bodyStyle={{ 
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              height: '100%',
+            }}>
+              <ArrowLeftOutlined style={{ fontSize: '14px' }} />
+              <span style={{ fontSize: '14px', fontWeight: '600' }}>
+                Đơn hàng trước đó
+              </span>
+            </Card>
+          </div>
+
+          {/* Order Details Card */}
+          <Card 
+            style={{ 
+              borderRadius: '20px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              ...(orderState.orderItems.length > 0 && { height: '800px' })
+            }}
+            bodyStyle={{ 
+              ...(orderState.orderItems.length > 0 && { height: '100%' }), 
+              padding: 0 
             }}
           >
             <OrderDetails 
@@ -352,6 +419,13 @@ const TableManagementPage: React.FC = () => {
         total={orderState.calculateTotal()}
         onClose={() => setPaymentModalVisible(false)}
         onConfirm={handlePaymentSuccess}
+      />
+
+      {/* Order History Sidebar */}
+      <OrderHistorySidebar
+        visible={orderHistorySidebarVisible}
+        onClose={() => setOrderHistorySidebarVisible(false)}
+        onSelectOrder={handleSelectHistoryOrder}
       />
     </div>
   );
