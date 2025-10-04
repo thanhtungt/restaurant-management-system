@@ -165,7 +165,7 @@ const OrderHistoryPage: React.FC = () => {
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <Input
                 placeholder="Tìm kiếm đơn hàng..."
-                prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+                prefix={<SearchOutlined style={{ color: '#000000' }} />}
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 size="large"

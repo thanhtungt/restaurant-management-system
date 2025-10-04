@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Empty, Divider, Space, message } from 'antd';
+import { Button, Empty, Divider, Space, message, App } from 'antd';
 import { ShoppingCartOutlined, ClearOutlined, PrinterOutlined, CalendarOutlined, ClockCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Table } from '../../../types/table';
 import { OrderItem } from '../../../types/order';
 import OrderItemComponent from './OrderItemComponent';
 import { orderService } from '../../../services/orderService';
+import tableStorageService from '../../../services/tableService';
 
 interface OrderDetailsProps {
   table: Table | null;
@@ -12,10 +13,13 @@ interface OrderDetailsProps {
   total: number;
   itemsCount: number;
   selectedFloor?: string;
+  currentOrder?: any; // Đơn hàng hiện tại (từ history)
+  showPaymentStatus?: boolean; // Flag để hiển thị banner trạng thái
   onUpdateQuantity: (menuItemId: string, quantity: number) => void;
   onRemoveItem: (menuItemId: string) => void;
   onClearOrder: () => void;
   onPayment: () => void;
+  onTableStatusChange?: () => void; // Callback khi cập nhật trạng thái bàn
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({
@@ -24,11 +28,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
   total,
   itemsCount,
   selectedFloor = '1',
+  currentOrder,
+  showPaymentStatus = false,
   onUpdateQuantity,
   onRemoveItem,
   onClearOrder,
   onPayment,
+  onTableStatusChange,
 }) => {
+  const { message: messageApi } = App.useApp();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -80,32 +88,65 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
 
   const handleSaveOrder = () => {
     if (!table || items.length === 0) {
-      message.warning('Vui lòng chọn bàn và thêm món ăn');
+      messageApi.warning('Vui lòng chọn bàn và thêm món ăn');
       return;
     }
 
     try {
+      console.log('Saving order...', { table, items, total, currentOrder });
+      
       const discountAmount = 30000; // Có thể thay đổi logic tính giảm giá
-      const order = orderService.saveOrder({
-        tableId: table.id,
-        tableName: table.number,
-        floor: selectedFloor,
-        items: items,
-        status: 'pending',
-        paymentStatus: 'unpaid',
-        total: total,
-        discount: discountAmount,
-        discountCode: 'XVYZ6H',
-        finalTotal: total - discountAmount,
-        staffName: 'Trần Văn B',
-        customerName: 'Lê Thị C',
-      });
-
-      message.success(`Đã lưu đơn hàng ${order.orderNumber}`);
-      // Có thể gọi onClearOrder() nếu muốn clear sau khi lưu
+      
+      let order;
+      
+      // Kiểm tra xem đã có đơn hàng hiện tại chưa
+      if (currentOrder && currentOrder.id) {
+        // CẬP NHẬT đơn hàng hiện tại
+        console.log('Updating existing order:', currentOrder.orderNumber);
+        order = orderService.updateOrder(currentOrder.id, {
+          items: items,
+          total: total,
+          discount: discountAmount,
+          finalTotal: total - discountAmount,
+        });
+        
+        if (order) {
+          console.log('Order updated successfully:', order.orderNumber);
+          messageApi.success(`Đã cập nhật đơn hàng ${order.orderNumber} thành công!`);
+        }
+      } else {
+        // TẠO MỚI đơn hàng
+        console.log('Creating new order for table:', table.number);
+        order = orderService.saveOrder({
+          tableId: table.id,
+          tableName: table.number,
+          floor: selectedFloor,
+          items: items,
+          status: 'pending',
+          paymentStatus: 'unpaid',
+          total: total,
+          discount: discountAmount,
+          discountCode: 'XVYZ6H',
+          finalTotal: total - discountAmount,
+          staffName: 'Trần Văn B',
+          customerName: 'Lê Thị C',
+        });
+        
+        console.log('Order created successfully:', order.orderNumber);
+        messageApi.success(`Đã lưu đơn hàng ${order.orderNumber} thành công!`);
+      }
+      
+      // Cập nhật trạng thái bàn thành "đang dùng"
+      const updatedTable = tableStorageService.updateTableStatus(table.id, 'inUse');
+      console.log('Table status updated to inUse:', updatedTable);
+      
+      // Gọi callback để refresh danh sách bàn
+      if (onTableStatusChange) {
+        onTableStatusChange();
+      }
     } catch (error) {
-      message.error('Lỗi khi lưu đơn hàng');
-      console.error(error);
+      console.error('Error saving order:', error);
+      messageApi.error('Lỗi khi lưu đơn hàng: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 
@@ -265,46 +306,52 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
             </span>
           </div>
           <div style={{ marginTop: '8px', fontSize: '13px', color: '#8c8c8c' }}>
-            <span style={{ fontWeight: '600' }}>Phương thức thanh toán:</span> chưa có
+            <span style={{ fontWeight: '600' }}>Phương thức thanh toán:</span> {currentOrder?.paymentMethod || 'Tiền mặt'}
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <Button
-              size="large"
-              block
-              onClick={handleSaveOrder}
-              style={{
-                height: '48px',
-                fontSize: '15px',
-                fontWeight: '600',
-                borderRadius: '8px',
-                border: '1px solid #d9d9d9',
-                background: '#fff',
-                color: '#262626',
-              }}
-            >
-              Lưu
-            </Button>
-            <Button
-              size="large"
-              block
-              style={{
-                height: '48px',
-                fontSize: '15px',
-                fontWeight: '600',
-                borderRadius: '8px',
-                border: '1px solid #d9d9d9',
-                background: '#fff',
-                color: '#262626',
-              }}
-            >
-              Hủy
-            </Button>
+        {/* Payment Status Banner - Chỉ hiển thị khi chọn từ đơn hàng trước đó */}
+        {currentOrder && showPaymentStatus && (
+          <div style={{
+            padding: '12px 16px',
+            marginBottom: '16px',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: currentOrder.paymentStatus === 'paid' ? '#f6ffed' : '#fff2e8',
+            border: `1px solid ${currentOrder.paymentStatus === 'paid' ? '#b7eb8f' : '#ffbb96'}`,
+          }}>
+            {currentOrder.paymentStatus === 'paid' ? (
+              <>
+                <span style={{ fontSize: '18px' }}>✓</span>
+                <span style={{ 
+                  fontSize: '14px', 
+                  fontWeight: '600',
+                  color: '#52c41a',
+                }}>
+                  Thanh Toán Thành Công!
+                </span>
+              </>
+            ) : (
+              <>
+                <span style={{ fontSize: '18px', color: '#ff4d4f' }}>✕</span>
+                <span style={{ 
+                  fontSize: '14px', 
+                  fontWeight: '600',
+                  color: '#ff4d4f',
+                }}>
+                  Chưa Thanh Toán
+                </span>
+              </>
+            )}
           </div>
-          <div style={{ display: 'flex', gap: '12px' }}>
+        )}
+
+        {/* Action Buttons */}
+        {showPaymentStatus ? (
+          // Khi xem đơn hàng từ lịch sử - chỉ hiển thị button "Xuất hóa đơn"
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <Button
               size="large"
               block
@@ -312,39 +359,101 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                 height: '48px',
                 fontSize: '15px',
                 fontWeight: '600',
-                background: '#52c41a',
-                borderColor: '#52c41a',
+                background: '#1890ff',
+                borderColor: '#1890ff',
                 color: '#fff',
                 borderRadius: '8px',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#73d13d';
-                e.currentTarget.style.borderColor = '#73d13d';
+                e.currentTarget.style.background = '#40a9ff';
+                e.currentTarget.style.borderColor = '#40a9ff';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#52c41a';
-                e.currentTarget.style.borderColor = '#52c41a';
+                e.currentTarget.style.background = '#1890ff';
+                e.currentTarget.style.borderColor = '#1890ff';
               }}
             >
               Xuất hóa đơn
             </Button>
-            <Button
-              type="primary"
-              size="large"
-              block
-              onClick={onPayment}
-              danger
-              style={{
-                height: '48px',
-                fontSize: '15px',
-                fontWeight: '600',
-                borderRadius: '8px',
-              }}
-            >
-              Thanh Toán
-            </Button>
           </div>
-        </div>
+        ) : (
+          // Khi tạo/chỉnh sửa đơn hàng - hiển thị tất cả buttons
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <Button
+                size="large"
+                block
+                onClick={handleSaveOrder}
+                style={{
+                  height: '48px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  borderRadius: '8px',
+                  border: '1px solid #d9d9d9',
+                  background: '#fff',
+                  color: '#262626',
+                }}
+              >
+                Lưu
+              </Button>
+              <Button
+                size="large"
+                block
+                style={{
+                  height: '48px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  borderRadius: '8px',
+                  border: '1px solid #d9d9d9',
+                  background: '#fff',
+                  color: '#262626',
+                }}
+              >
+                Hủy
+              </Button>
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <Button
+                size="large"
+                block
+                style={{
+                  height: '48px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  background: '#52c41a',
+                  borderColor: '#52c41a',
+                  color: '#fff',
+                  borderRadius: '8px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#73d13d';
+                  e.currentTarget.style.borderColor = '#73d13d';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#52c41a';
+                  e.currentTarget.style.borderColor = '#52c41a';
+                }}
+              >
+                Xuất hóa đơn
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                block
+                onClick={onPayment}
+                danger
+                style={{
+                  height: '48px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  borderRadius: '8px',
+                }}
+              >
+                Thanh Toán
+              </Button>
+            </div>
+          </div>
+        )}
     </div>
   );
 };

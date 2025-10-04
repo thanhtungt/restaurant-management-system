@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { message } from 'antd';
 import { MenuItem } from '../../../types/menu';
 import { Table } from '../../../types/table';
@@ -11,6 +11,9 @@ export const useOrder = (tableId?: string) => {
   const [notes, setNotes] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
+  const [isLoadingFromHistory, setIsLoadingFromHistory] = useState<boolean>(false);
+  const [showPaymentStatus, setShowPaymentStatus] = useState<boolean>(false); // Flag để hiển thị banner trạng thái
+  const previousTableIdRef = useRef<string | undefined>(tableId);
 
   // Add item to order
   const addItem = (menuItem: MenuItem, quantity: number = 1) => {
@@ -33,7 +36,7 @@ export const useOrder = (tableId?: string) => {
         // Add new item
         const newItem: OrderItem = {
           menuItem: menuItem,
-          quantity: quantity,
+          quantity: quantity, 
         };
         message.success(`Đã thêm ${menuItem.name}`);
         return [...prevItems, newItem];
@@ -84,16 +87,23 @@ export const useOrder = (tableId?: string) => {
   };
 
   // Clear all items
-  const clearOrder = () => {
+  const clearOrder = (showMessage: boolean = true) => {
     setOrderItems([]);
     setNotes('');
-    message.success('Đã xóa tất cả món');
+    setCurrentOrder(null);
+    setShowPaymentStatus(false); // Reset flag
+    if (showMessage) {
+      message.success('Đã xóa tất cả món');
+    }
   };
 
-  // Load order from history
-  const loadOrderFromHistory = (order: Order) => {
-    setOrderItems(order.items);
+  // Load order from history sidebar - hiển thị banner trạng thái
+  const loadOrderFromHistory = (order: Order, fromSidebar: boolean = true) => {
+    console.log('Loading order from history:', order.orderNumber, 'fromSidebar:', fromSidebar);
+    setIsLoadingFromHistory(true); // Set flag
+    setShowPaymentStatus(fromSidebar); // Chỉ hiển thị banner nếu từ sidebar
     setCurrentOrder(order);
+    setOrderItems(order.items);
     setNotes(order.notes || '');
     message.success(`Đã tải đơn hàng ${order.orderNumber}`);
   };
@@ -167,14 +177,24 @@ export const useOrder = (tableId?: string) => {
 
   // Load order by table
   useEffect(() => {
-    if (tableId) {
-      // Load existing order for this table if any
-      // This would require an API endpoint like getOrderByTableId
-      // For now, just reset the order
+    const previousTableId = previousTableIdRef.current;
+    
+    // Chỉ clear khi tableId thay đổi VÀ không phải từ history
+    if (tableId && previousTableId !== tableId && !isLoadingFromHistory) {
+      console.log('Table changed from', previousTableId, 'to', tableId, '- clearing order');
       setOrderItems([]);
       setNotes('');
+      setCurrentOrder(null);
     }
-  }, [tableId]);
+    
+    // Reset flag sau khi đã xử lý
+    if (isLoadingFromHistory) {
+      setIsLoadingFromHistory(false);
+    }
+    
+    // Update ref
+    previousTableIdRef.current = tableId;
+  }, [tableId, isLoadingFromHistory]);
 
   return {
     orderItems,
@@ -184,6 +204,7 @@ export const useOrder = (tableId?: string) => {
     setNotes,
     loading,
     currentOrder,
+    showPaymentStatus,
     addItem,
     removeItem,
     updateQuantity,

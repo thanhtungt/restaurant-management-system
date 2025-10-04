@@ -22,8 +22,8 @@ const MenuCategoryFilter: React.FC<MenuCategoryFilterProps> = ({
         onClick={() => onCategoryChange('all')}
         style={{ 
           borderRadius: '20px',
-          border: selectedCategory === 'all' ? 'none' : '2px solid #1890ff',
-          color: selectedCategory === 'all' ? '#fff' : '#1890ff',
+          border: selectedCategory === 'all' ? 'none' : '2px solid #5296E5',
+          color: selectedCategory === 'all' ? '#fff' : '#5296E5',
           fontWeight: '500',
           height: '36px',
           padding: '0 20px',
@@ -39,8 +39,8 @@ const MenuCategoryFilter: React.FC<MenuCategoryFilterProps> = ({
           onClick={() => onCategoryChange(category.id)}
           style={{ 
             borderRadius: '20px',
-            border: selectedCategory === category.id ? 'none' : '2px solid #1890ff',
-            color: selectedCategory === category.id ? '#fff' : '#1890ff',
+            border: selectedCategory === category.id ? 'none' : '2px solid #5296E5',
+            color: selectedCategory === category.id ? '#fff' : '#5296E5',
             fontWeight: '500',
             height: '36px',
             padding: '0 20px',

@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Button, Space, Badge, Select, Input } from 'antd';
 import { SearchOutlined, LeftOutlined, CalendarOutlined, ClockCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Table } from '../../../types/table';
 import { Order } from '../../../types/order';
+import tableStorageService from '../../../services/tableService';
+import { orderService } from '../../../services/orderService';
 import MenuItems from '../../menu/components/MenuItems';
 import MenuCategoryFilter from '../../menu/components/MenuCategoryFilter';
 import OrderDetails from '../../order/components/OrderDetails';
@@ -24,78 +26,206 @@ const TableManagementPage: React.FC = () => {
   // Use custom hooks
   const menuState = useMenu();
   const orderState = useOrder(selectedTable?.id);
-  const { tables, loading: tablesLoading } = useTables();
+  const { tables, loading: tablesLoading, refreshTables } = useTables();
+
+  // Auto-select bàn B1 (bàn đầu tiên ở tầng 1) khi page load
+  useEffect(() => {
+    if (tables.length > 0 && !selectedTable && !selectedHistoryOrder && selectedFloor === '1') {
+      // Tìm bàn B1 ở tầng 1
+      const firstTable = tables.find(t => t.floor === 1 && t.number === 'B1');
+      if (firstTable) {
+        setSelectedTable(firstTable);
+        console.log('Auto-selected table B1:', firstTable);
+      }
+    }
+  }, [tables, selectedTable, selectedHistoryOrder, selectedFloor]);
 
   const handleTableClick = (table: Table) => {
     setSelectedTable(table);
+    
+    // Nếu bàn đang dùng, load đơn hàng hiện tại của bàn đó
+    if (table.status === 'inUse') {
+      console.log('Table is in use, loading current order for table:', table.number);
+      
+      // Tìm đơn hàng gần nhất của bàn này từ localStorage
+      const allOrders = orderService.getAllOrders();
+      const tableOrders = allOrders.filter(order => order.tableId === table.id);
+      
+      // Lấy đơn hàng gần nhất (chưa thanh toán)
+      const currentOrder = tableOrders
+        .filter(order => order.paymentStatus === 'unpaid')
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+      
+      if (currentOrder) {
+        console.log('Found current order:', currentOrder.orderNumber);
+        // Load order KHÔNG hiển thị banner (fromSidebar = false)
+        orderState.loadOrderFromHistory(currentOrder, false);
+      } else {
+        console.log('No unpaid order found for this table');
+        // Clear order nếu không tìm thấy (không hiển thị message)
+        orderState.clearOrder(false);
+      }
+    } else {
+      // Bàn trống hoặc đã đặt - clear order (không hiển thị message)
+      console.log('Table is empty/reserved, clearing order');
+      orderState.clearOrder(false);
+    }
+  };
+
+  const handleOpenPaymentModal = () => {
+    // Kiểm tra xem có đơn hàng không
+    if (!selectedTable || orderState.orderItems.length === 0) {
+      return;
+    }
+    
+    // Tự động lưu/update đơn hàng trước khi thanh toán
+    const discountAmount = 30000;
+    const total = orderState.calculateTotal();
+    
+    if (orderState.currentOrder && orderState.currentOrder.id) {
+      // Cập nhật đơn hàng hiện tại
+      console.log('Auto-updating order before payment:', orderState.currentOrder.orderNumber);
+      orderService.updateOrder(orderState.currentOrder.id, {
+        items: orderState.orderItems,
+        total: total,
+        discount: discountAmount,
+        finalTotal: total - discountAmount,
+      });
+    } else {
+      // Tạo đơn hàng mới
+      console.log('Auto-creating order before payment');
+      const newOrder = orderService.saveOrder({
+        tableId: selectedTable.id,
+        tableName: selectedTable.number,
+        floor: selectedFloor,
+        items: orderState.orderItems,
+        status: 'pending',
+        paymentStatus: 'unpaid',
+        total: total,
+        discount: discountAmount,
+        discountCode: 'XVYZ6H',
+        finalTotal: total - discountAmount,
+        staffName: 'Trần Văn B',
+        customerName: 'Lê Thị C',
+      });
+      
+      // Cập nhật currentOrder trong state
+      // Note: Cần reload order để có ID
+      const allOrders = orderService.getAllOrders();
+      const savedOrder = allOrders.find(o => o.orderNumber === newOrder.orderNumber);
+      if (savedOrder) {
+        orderState.loadOrderFromHistory(savedOrder, false);
+      }
+      
+      // Cập nhật trạng thái bàn
+      tableStorageService.updateTableStatus(selectedTable.id, 'inUse');
+      refreshTables();
+    }
+    
+    // Mở payment modal
+    setPaymentModalVisible(true);
   };
 
   const handlePaymentSuccess = async (paymentData: any) => {
-    // Payment will be handled by PaymentModal
+    console.log('Payment success, updating order status...', paymentData);
+    
+    // Cập nhật trạng thái thanh toán của đơn hàng
+    if (orderState.currentOrder && orderState.currentOrder.id) {
+      const updatedOrder = orderService.updatePaymentStatus(
+        orderState.currentOrder.id, 
+        'paid',
+        paymentData.method
+      );
+      console.log('Order payment status updated:', updatedOrder?.orderNumber);
+    }
+    
+    // Đóng modal
     setPaymentModalVisible(false);
+    
+    // Reset table status to empty after payment
+    if (selectedTable) {
+      tableStorageService.updateTableStatus(selectedTable.id, 'empty');
+      refreshTables();
+    }
+    
+    // Clear order và deselect table
     orderState.clearOrder();
+    setSelectedTable(null);
   };
 
   const handleSelectHistoryOrder = (order: Order) => {
-    setSelectedHistoryOrder(order);
+    console.log('Selecting history order:', order.orderNumber);
     
     // Find and select the table from the order
     const orderTable = tables.find(t => t.id === order.tableId);
-    if (orderTable) {
-      setSelectedTable(orderTable);
-    }
     
-    // Load order items to OrderDetails
-    orderState.loadOrderFromHistory(order);
-    setOrderHistorySidebarVisible(false);
+    if (orderTable) {
+      console.log('Found table for order:', orderTable.number);
+      setSelectedTable(orderTable);
+      setSelectedHistoryOrder(order);
+      
+      // Load order items với banner trạng thái (fromSidebar = true)
+      orderState.loadOrderFromHistory(order, true);
+      setOrderHistorySidebarVisible(false);
+    } else {
+      console.warn('Table not found for order:', order.tableId);
+      // Vẫn load order nhưng không có bàn
+      setSelectedHistoryOrder(order);
+      orderState.loadOrderFromHistory(order, true);
+      setOrderHistorySidebarVisible(false);
+    }
   };
 
-  const getTableStyle = (table: Table) => {
+  const getTableStyle = (table: Table): React.CSSProperties => {
     const isSelected = selectedTable?.id === table.id;
-    const baseStyle = {
+    const baseStyle: React.CSSProperties = {
       width: '100%',
       height: '80px',
       fontSize: '16px',
       fontWeight: '600',
-      borderRadius: '8px',
+      borderRadius: '0',
       transition: 'all 0.3s',
     };
 
-    if (isSelected) {
-      return { 
-        ...baseStyle, 
-        background: '#1890ff', 
-        color: '#fff', 
-        border: '3px dashed #0050b3',
-        boxShadow: '0 4px 12px rgba(24, 144, 255, 0.4)',
-      };
-    }
+    let style: React.CSSProperties = { ...baseStyle };
 
     switch (table.status) {
       case 'empty':
-        return { 
-          ...baseStyle, 
-          background: '#0088FF', 
+        style = { 
+          ...style, 
+          background: '#5296E5', 
           color: '#fff',
           border: 'none',
         };
+        break;
       case 'inUse':
-        return { 
-          ...baseStyle, 
+        style = { 
+          ...style, 
           background: '#C4C4C4', 
           color: '#fff', 
           border: 'none',
         };
+        break;
       case 'reserved':
-        return { 
-          ...baseStyle, 
+        style = { 
+          ...style, 
           background: '#FF5F57', 
           color: '#fff', 
           border: 'none',
         };
+        break;
       default:
-        return baseStyle;
+        break;
     }
+
+    if (isSelected) {
+      style = {
+        ...style,
+        border: '3px dashed #0050b3',
+      };
+    }
+
+    return style;
   };
 
   // Count tables by status
@@ -114,13 +244,31 @@ const TableManagementPage: React.FC = () => {
   return (
     <div style={{ padding: '24px', background: '#f0f2f5', minHeight: 'calc(100vh - 80px)' }}>
       {/* Back button */}
-      <Button 
-        type="text" 
-        icon={<LeftOutlined />}
-        style={{ marginBottom: '16px', color: '#1890ff', fontSize: '14px' }}
-      >
-        Quay lại
-      </Button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+        <Button 
+          type="primary"
+          icon={<ArrowLeftOutlined />}
+          shape="circle"
+          style={{ 
+            backgroundColor: '#0088FF',
+            borderColor: '#0088FF',
+            width: '32px',
+            height: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '14px'
+          }}
+        />
+        <span style={{ 
+          fontSize: '16px', 
+          fontWeight: '600', 
+          color: '#0088FF',
+          cursor: 'pointer'
+        }}>
+          Quay lại
+        </span>
+      </div>
 
       <Row gutter={16}>
         {/* Left Column - Menu & Tables */}
@@ -133,7 +281,7 @@ const TableManagementPage: React.FC = () => {
               marginBottom: '16px',
               overflow: 'hidden',
             }}
-            bodyStyle={{ padding: 0 }}
+            styles={{ body: { padding: 0 } }}
           >
             {/* Blue Header */}
             <div
@@ -157,7 +305,7 @@ const TableManagementPage: React.FC = () => {
               </h2>
               <Input
                 placeholder="Nhập tên món ăn..."
-                prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+                prefix={<SearchOutlined style={{ color: '#000000' }} />}
                 style={{
                   width: 300,
                   borderRadius: '24px',
@@ -193,46 +341,63 @@ const TableManagementPage: React.FC = () => {
               borderRadius: '20px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
             }}
-            bodyStyle={{ padding: '24px' }}
+            styles={{ body: { padding: '24px' } }}
           >
             {/* Header with Ca badge and Floor selector */}
             <div style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
-              alignItems: 'center',
+              alignItems: 'flex-start',
               marginBottom: '20px',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <h2 style={{ 
                   margin: 0, 
                   fontSize: '24px', 
                   fontWeight: '700',
-                  color: '#262626',
+                  color: '#000000',
                 }}>
                   Chọn bàn
                 </h2>
-                <span style={{
-                  background: '#faad14',
-                  color: '#fff',
-                  padding: '4px 12px',
-                  borderRadius: '12px',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                }}>
-                  Ca: Tối
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#000000',
+                  }}>
+                    Ca:
+                  </span>
+                  <span style={{
+                    background: '#FF9D00',
+                    color: '#FFFFFF',
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                  }}>
+                    Tối
+                  </span>
+                </div>
               </div>
               
               <Select 
                 value={selectedFloor}
                 onChange={setSelectedFloor}
-                style={{ width: 140 }}
+                style={{ width: 140, fontWeight: '700' }}
                 size="large"
               >
                 <Option value="1">Tầng 1</Option>
                
               </Select>
             </div>
+
+            {/* Divider Line */}
+            <div style={{ 
+              width: '100%', 
+              height: '1px', 
+              background: '#d9d9d9',
+              marginBottom: '20px',
+            }} />
 
             {/* Status legend with counts */}
             <div style={{ 
@@ -241,15 +406,13 @@ const TableManagementPage: React.FC = () => {
               alignItems: 'center',
               marginBottom: '20px',
               padding: '12px 16px',
-              background: '#fafafa',
-              borderRadius: '8px',
             }}>
               <Space size={24}>
                 <Space size={8}>
                   <span style={{ 
-                    fontSize: '15px', 
-                    fontWeight: '600',
-                    color: '#262626',
+                    fontSize: '16px', 
+                    fontWeight: '700',
+                    color: '#000000',
                   }}>
                     Đang trống:
                   </span>
@@ -257,42 +420,42 @@ const TableManagementPage: React.FC = () => {
                     count={tableCounts.empty} 
                     style={{ 
                       backgroundColor: '#0088FF',
-                      color: '#fff',
-                      fontWeight: '600',
+                      color: '#FFFFFF',
+                      fontWeight: '700',
                     }}
                   />
                 </Space>
                 <Space size={8}>
                   <span style={{ 
-                    fontSize: '15px', 
-                    fontWeight: '600',
-                    color: '#262626',
+                    fontSize: '16px', 
+                    fontWeight: '700',
+                    color: '#000000',
                   }}>
                     Đang dùng:
                   </span>
                   <Badge 
                     count={tableCounts.inUse} 
                     style={{ 
-                      backgroundColor: '#C4C4C4',
-                      color: '#fff',
-                      fontWeight: '600',
+                      backgroundColor: '#C3C3C3',
+                      color: '#FFFFFF',
+                      fontWeight: '700',
                     }}
                   />
                 </Space>
                 <Space size={8}>
                   <span style={{ 
-                    fontSize: '15px', 
-                    fontWeight: '600',
-                    color: '#262626',
+                    fontSize: '16px', 
+                    fontWeight: '700',
+                    color: '#000000',
                   }}>
                     Đặt trước:
                   </span>
                   <Badge 
                     count={tableCounts.reserved} 
                     style={{ 
-                      backgroundColor: '#FF5F57',
-                      color: '#fff',
-                      fontWeight: '600',
+                      backgroundColor: '#F90000',
+                      color: '#FFFFFF',
+                      fontWeight: '700',
                     }}
                   />
                 </Space>
@@ -300,9 +463,9 @@ const TableManagementPage: React.FC = () => {
               
               <Space size={8}>
                 <span style={{ 
-                  fontSize: '15px', 
-                  fontWeight: '600',
-                  color: '#1890ff',
+                  fontSize: '16px', 
+                  fontWeight: '700',
+                  color: '#5296E5',
                 }}>
                   Đang chọn:
                 </span>
@@ -310,9 +473,9 @@ const TableManagementPage: React.FC = () => {
                   <Badge 
                     count={`${selectedTable.number}`}
                     style={{ 
-                      backgroundColor: '#1890ff',
-                      color: '#fff',
-                      fontWeight: '600',
+                      backgroundColor: '#5296E5',
+                      color: '#FFFFFF',
+                      fontWeight: '700',
                       fontSize: '13px',
                     }}
                   />
@@ -346,7 +509,7 @@ const TableManagementPage: React.FC = () => {
             <Card style={{
               borderRadius: '12px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            }} bodyStyle={{ padding: '12px 16px' }}>
+            }} styles={{ body: { padding: '12px 16px' } }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <CalendarOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
                 <span style={{ fontSize: '14px', fontWeight: '500' }}>
@@ -369,13 +532,15 @@ const TableManagementPage: React.FC = () => {
               cursor: 'pointer',
             }}
             onClick={() => setOrderHistorySidebarVisible(true)}
-            bodyStyle={{ 
-              padding: '12px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              height: '100%',
+            styles={{ 
+              body: {
+                padding: '12px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                height: '100%',
+              }
             }}>
               <ArrowLeftOutlined style={{ fontSize: '14px' }} />
               <span style={{ fontSize: '14px', fontWeight: '600' }}>
@@ -391,9 +556,11 @@ const TableManagementPage: React.FC = () => {
               boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               ...(orderState.orderItems.length > 0 && { height: '800px' })
             }}
-            bodyStyle={{ 
-              ...(orderState.orderItems.length > 0 && { height: '100%' }), 
-              padding: 0 
+            styles={{ 
+              body: {
+                ...(orderState.orderItems.length > 0 && { height: '100%' }), 
+                padding: 0 
+              }
             }}
           >
             <OrderDetails 
@@ -402,10 +569,13 @@ const TableManagementPage: React.FC = () => {
               total={orderState.calculateTotal()}
               itemsCount={orderState.getTotalItemsCount()}
               selectedFloor={selectedFloor}
+              currentOrder={orderState.currentOrder}
+              showPaymentStatus={orderState.showPaymentStatus}
               onUpdateQuantity={orderState.updateQuantity}
               onRemoveItem={orderState.removeItem}
               onClearOrder={orderState.clearOrder}
-              onPayment={() => setPaymentModalVisible(true)}
+              onPayment={handleOpenPaymentModal}
+              onTableStatusChange={refreshTables}
             />
           </Card>
         </Col>

@@ -43,11 +43,25 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     }
   }, [visible]);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (paymentMethod === 'Chuyển khoản') {
       setPaymentStatus('qr');
     } else {
-      handleConfirm();
+      // Thanh toán tiền mặt - hiển thị modal success
+      try {
+        setLoading(true);
+        
+        // Simulate payment processing
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Chỉ hiển thị modal success, KHÔNG gọi onConfirm ở đây
+        setPaymentStatus('success');
+      } catch (error) {
+        console.error('Payment error:', error);
+        setPaymentStatus('failed');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -55,23 +69,13 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     try {
       setLoading(true);
       
-      // Simulate payment processing
+      // Simulate payment processing cho quét mã
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Random success/failure for demo
-      const isSuccess = Math.random() > 0.3;
-      
-      if (isSuccess) {
-        setPaymentStatus('success');
-        await onConfirm({
-          method: 'cash',
-          amountPaid: total,
-          change: 0,
-        });
-      } else {
-        setPaymentStatus('failed');
-      }
+      // Chỉ hiển thị modal success, KHÔNG gọi onConfirm ở đây
+      setPaymentStatus('success');
     } catch (error) {
+      console.error('Payment error:', error);
       setPaymentStatus('failed');
     } finally {
       setLoading(false);
@@ -82,9 +86,24 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     setPaymentStatus('selecting');
   };
 
-  const handleExit = () => {
+  const handleExit = async () => {
+    // Nếu đang ở trạng thái success, gọi onConfirm trước khi đóng
+    if (paymentStatus === 'success') {
+      await onConfirm({
+        method: paymentMethod === 'Chuyển khoản' ? 'transfer' : 'cash',
+        amountPaid: total,
+        change: 0,
+      });
+    }
+    
+    // Reset và đóng modal
     setPaymentStatus('selecting');
+    setPaymentMethod('Tiền mặt');
     onClose();
+  };
+
+  const handleCancel = () => {
+    setPaymentStatus('failed');
   };
 
   // Render content based on status
@@ -113,7 +132,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               <Button 
                 size="large" 
                 block
-                onClick={onClose}
+                onClick={handleCancel}
                 style={{ 
                   height: '44px',
                   fontSize: '15px',
@@ -190,7 +209,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               <Button 
                 size="large" 
                 block
-                onClick={onClose}
+                onClick={handleCancel}
                 style={{ 
                   height: '44px',
                   fontSize: '15px',
@@ -221,7 +240,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         return (
           <div style={{ textAlign: 'center' }}>
             <Select
-              value="Chuyển khoản"
+              value="Đơn hàng của bạn"
               disabled
               size="large"
               style={{ width: '100%', marginBottom: '30px' }}
@@ -235,11 +254,27 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               }}>
                 Thanh toán thành công!
               </p>
-              <CheckCircleOutlined style={{ 
-                fontSize: '100px',
-                color: '#52c41a',
-                marginBottom: '20px',
-              }} />
+              <div style={{
+                width: '120px',
+                height: '120px',
+                margin: '0 auto 20px',
+                borderRadius: '50%',
+                border: '6px solid #52c41a',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+              }}>
+                <div style={{
+                  width: '60px',
+                  height: '30px',
+                  borderBottom: '6px solid #52c41a',
+                  borderLeft: '6px solid #52c41a',
+                  transform: 'rotate(-45deg)',
+                  marginTop: '-10px',
+                  marginLeft: '5px',
+                }}></div>
+              </div>
             </div>
             <div style={{ 
               fontSize: '16px',
@@ -263,6 +298,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                 height: '44px',
                 fontSize: '15px',
                 borderRadius: '8px',
+                background: '#1890ff',
               }}
             >
               Thoát
@@ -274,7 +310,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         return (
           <div style={{ textAlign: 'center' }}>
             <Select
-              value="Chuyển khoản"
+              value="Đơn hàng của bạn"
               disabled
               size="large"
               style={{ width: '100%', marginBottom: '30px' }}
@@ -288,11 +324,32 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               }}>
                 Thanh toán thất bại
               </p>
-              <CloseCircleOutlined style={{ 
-                fontSize: '100px',
-                color: '#ff4d4f',
-                marginBottom: '20px',
-              }} />
+              <div style={{
+                width: '120px',
+                height: '120px',
+                margin: '0 auto 20px',
+                borderRadius: '50%',
+                border: '6px solid #ff4d4f',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  width: '70px',
+                  height: '6px',
+                  background: '#ff4d4f',
+                  transform: 'rotate(45deg)',
+                }}></div>
+                <div style={{
+                  position: 'absolute',
+                  width: '70px',
+                  height: '6px',
+                  background: '#ff4d4f',
+                  transform: 'rotate(-45deg)',
+                }}></div>
+              </div>
             </div>
             <div style={{ 
               fontSize: '16px',
@@ -316,6 +373,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                   height: '44px',
                   fontSize: '15px',
                   borderRadius: '8px',
+                  border: '1px solid #d9d9d9',
                 }}
               >
                 Thử lại
@@ -329,6 +387,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                   height: '44px',
                   fontSize: '15px',
                   borderRadius: '8px',
+                  background: '#1890ff',
                 }}
               >
                 Thoát

@@ -28,7 +28,7 @@ const MenuPage: React.FC = () => {
         extra={
           <Input
             placeholder="Nhập tên món ăn..."
-            prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+            prefix={<SearchOutlined style={{ color: '#000000' }} />}
             style={{ width: 300, borderRadius: '8px' }}
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}

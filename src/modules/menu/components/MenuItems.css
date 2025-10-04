@@ -4,25 +4,17 @@
   overflow-x: auto;
   overflow-y: hidden;
   padding: 8px 0;
-  scrollbar-width: thin;
-  scrollbar-color: #1890ff #f0f0f0;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  cursor: grab;
+  scroll-behavior: smooth;
 }
 
-/* Custom scrollbar for webkit browsers */
+.menu-items-scroll:active {
+  cursor: grabbing;
+}
+
+/* Hide scrollbar for webkit browsers */
 .menu-items-scroll::-webkit-scrollbar {
-  height: 8px;
-}
-
-.menu-items-scroll::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 4px;
-}
-
-.menu-items-scroll::-webkit-scrollbar-thumb {
-  background: #1890ff;
-  border-radius: 4px;
-}
-
-.menu-items-scroll::-webkit-scrollbar-thumb:hover {
-  background: #096dd9;
+  display: none;
 }

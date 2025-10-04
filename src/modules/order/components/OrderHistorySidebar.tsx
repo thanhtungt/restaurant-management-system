@@ -19,10 +19,18 @@ const OrderHistorySidebar: React.FC<OrderHistorySidebarProps> = ({
   const [searchText, setSearchText] = useState('');
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
+  // Load orders khi component mount
+  useEffect(() => {
+    const allOrders = orderService.getAllOrders();
+    console.log('Initial orders loaded:', allOrders.length);
+    setOrders(allOrders);
+  }, []);
+
+  // Reload orders mỗi khi sidebar mở để có dữ liệu mới nhất
   useEffect(() => {
     if (visible) {
-      // Load orders from localStorage
       const allOrders = orderService.getAllOrders();
+      console.log('Reloading orders on sidebar open:', allOrders.length);
       setOrders(allOrders);
     }
   }, [visible]);
@@ -76,17 +84,19 @@ const OrderHistorySidebar: React.FC<OrderHistorySidebarProps> = ({
       open={visible}
       width={500}
       closeIcon={<CloseOutlined style={{ fontSize: '16px' }} />}
-      bodyStyle={{ padding: '16px', background: '#f5f5f5' }}
-      headerStyle={{ 
-        borderBottom: '1px solid #f0f0f0',
-        padding: '16px 24px',
+      styles={{
+        body: { padding: '16px', background: '#f5f5f5' },
+        header: { 
+          borderBottom: '1px solid #f0f0f0',
+          padding: '16px 24px',
+        }
       }}
     >
       {/* Search Box */}
       <div style={{ marginBottom: '16px' }}>
         <Input
           placeholder="Tìm kiếm đơn hàng..."
-          prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+          prefix={<SearchOutlined style={{ color: '#000000' }} />}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           size="large"

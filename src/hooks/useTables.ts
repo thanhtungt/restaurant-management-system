@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import tableService from '../modules/table-management/services/tableService';
+import tableStorageService from '../services/tableService';
 import { Table } from '../types/table';
 
 export const useTables = (floor?: number) => {
@@ -7,37 +7,39 @@ export const useTables = (floor?: number) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    const fetchTables = async () => {
-      try {
-        setLoading(true);
-        const fetchedTables = await tableService.getAllTables();
+  const loadTables = () => {
+    try {
+      setLoading(true);
+      const fetchedTables = tableStorageService.getAllTables();
+      
+      // Filter by floor if provided
+      const filteredTables = floor
+        ? fetchedTables.filter(table => table.floor === floor)
+        : fetchedTables;
         
-        // Filter by floor if provided
-        const filteredTables = floor
-          ? fetchedTables.filter(table => table.floor === floor)
-          : fetchedTables;
-          
-        setTables(filteredTables);
-        setError(null);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setTables(filteredTables);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchTables();
+  useEffect(() => {
+    loadTables();
   }, [floor]);
 
-  const updateTableStatus = async (tableId: string, newStatus: string) => {
+  const updateTableStatus = (tableId: string, newStatus: 'empty' | 'inUse' | 'reserved') => {
     try {
-      const updatedTable = await tableService.updateTableStatus(tableId, newStatus);
-      setTables(prevTables => 
-        prevTables.map(table => 
-          table.id === tableId ? { ...table, status: updatedTable.status } : table
-        )
-      );
+      const updatedTable = tableStorageService.updateTableStatus(tableId, newStatus);
+      if (updatedTable) {
+        setTables(prevTables => 
+          prevTables.map(table => 
+            table.id === tableId ? updatedTable : table
+          )
+        );
+      }
       return updatedTable;
     } catch (err) {
       setError(err as Error);
@@ -45,7 +47,11 @@ export const useTables = (floor?: number) => {
     }
   };
 
-  return { tables, loading, error, updateTableStatus };
+  const refreshTables = () => {
+    loadTables();
+  };
+
+  return { tables, loading, error, updateTableStatus, refreshTables };
 };
 
 export default useTables;

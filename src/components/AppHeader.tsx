@@ -91,7 +91,7 @@ const AppHeader: React.FC = () => {
               size={40} 
               icon={<UserOutlined />} 
               style={{ 
-                backgroundColor: '#faad14',
+                backgroundColor: '#0088FF',
                 border: '2px solid #fff',
                 color: '#fff'
               }}
@@ -107,7 +107,7 @@ const AppHeader: React.FC = () => {
                 {authState.user?.name || 'User'}
               </div>
               <span style={{
-                backgroundColor: authState.user?.role === 'admin' ? '#ff8c00' : '#1890ff',
+                backgroundColor: authState.user?.role === 'admin' ? '#FEBC2F' : '#FEBC2F',
                 color: '#fff',
                 padding: '2px 8px',
                 borderRadius: '12px',
@@ -119,7 +119,7 @@ const AppHeader: React.FC = () => {
                 whiteSpace: 'nowrap',
                 height: '20px'
               }}>
-                <HomeOutlined style={{ fontSize: '10px' }} />
+               
                 {authState.user?.role === 'admin' ? 'Admin' : 'Bồi bàn'}
               </span>
             </div>

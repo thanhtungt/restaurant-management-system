@@ -79,12 +79,33 @@ const OrderDetailPage: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Button
-              type="text"
+              type="primary"
               icon={<ArrowLeftOutlined />}
               onClick={() => navigate('/order-history')}
-              style={{ fontSize: '16px' }}
+              shape="circle"
+              style={{ 
+                backgroundColor: '#0088FF',
+                borderColor: '#0088FF',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '14px'
+              }}
             />
-            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '700', color: '#262626' }}>
+            <span 
+              onClick={() => navigate('/order-history')}
+              style={{ 
+                fontSize: '16px', 
+                fontWeight: '600', 
+                color: '#0088FF',
+                cursor: 'pointer'
+              }}
+            >
+              Quay lại
+            </span>
+            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '700', color: '#262626', marginLeft: '12px' }}>
               Đơn hàng
             </h1>
           </div>

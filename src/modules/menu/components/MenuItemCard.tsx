@@ -90,20 +90,19 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onAddItem }) => {
           {item.name}
         </h4>
 
-        {item.description && (
-          <p
-            style={{
-              margin: '2px 0',
-              fontSize: '11px',
-              color: '#8c8c8c',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {item.description}
-          </p>
-        )}
+        <p
+          style={{
+            margin: '2px 0',
+            fontSize: '11px',
+            color: '#8c8c8c',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            minHeight: '16px',
+          }}
+        >
+          {item.description || '\u00A0'}
+        </p>
 
         <div
           style={{
@@ -117,14 +116,13 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onAddItem }) => {
             style={{
               fontSize: '15px',
               fontWeight: '700',
-              color: '#1890ff',
+              color: '#1A72DD',
             }}
           >
-            GNF {item.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            {item.price.toLocaleString('vi-VN')} VND
           </span>
           <Button
             type="primary"
-            shape="circle"
             icon={<PlusOutlined />}
             onClick={handleAddClick}
             size="small"
@@ -132,8 +130,9 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onAddItem }) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#1890ff',
-              borderColor: '#1890ff',
+              backgroundColor: '#0D62CA',
+              borderColor: '#1A72DD',
+              borderRadius: '8px',
             }}
           />
         </div>
