@@ -81,15 +81,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       return true;
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to login';
       setAuthState((prev: AuthState) => ({
         ...prev,
         isAuthenticated: false,
         user: null,
         token: null,
         loading: false,
-        error: error instanceof Error ? error.message : 'Failed to login',
+        error: errorMessage,
       }));
-      return false;
+      // Throw error để LoginPage có thể catch và hiển thị thông báo
+      throw error;
     }
   };
 

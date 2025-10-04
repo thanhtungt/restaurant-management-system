@@ -28,15 +28,18 @@ const authService = {
           (u) => u.username.toLowerCase() === credentials.username.toLowerCase()
         );
 
-        if (user && credentials.password === '123456') {
+        if (!user) {
+          // User not found
+          reject(new Error('Tên đăng nhập không tồn tại!'));
+        } else if (credentials.password !== '123456') {
+          // Wrong password
+          reject(new Error('Mật khẩu không chính xác!'));
+        } else {
           // Mock successful login
           resolve({
             user,
             token: `mock-jwt-token-${user.id}-${Date.now()}`,
           });
-        } else {
-          // Mock login failure
-          reject(new Error('Invalid username or password'));
         }
       }, 500); // Simulate network delay
     });

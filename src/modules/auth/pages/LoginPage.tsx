@@ -163,8 +163,9 @@ const LoginPage: React.FC = () => {
       if (success) {
         // Redirect will happen automatically due to the conditional redirect above
       }
-    } catch (err) {
-      setError('Đăng nhập thất bại. Vui lòng thử lại.');
+    } catch (err: any) {
+      const errorMessage = err.message || 'Đăng nhập thất bại. Vui lòng thử lại.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
