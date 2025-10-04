@@ -25,7 +25,7 @@ const authService = {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const user = MOCK_USERS.find(
-          (u) => u.username === credentials.username
+          (u) => u.username.toLowerCase() === credentials.username.toLowerCase()
         );
 
         if (user && credentials.password === '123456') {
