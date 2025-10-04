@@ -45,7 +45,6 @@ const TableManagementPage: React.FC = () => {
       const firstTable = tables.find(t => t.floor === 1 && t.number === 'B1');
       if (firstTable) {
         setSelectedTable(firstTable);
-        console.log('Auto-selected table B1:', firstTable);
       }
     }
   }, [tables, selectedTable, selectedHistoryOrder, selectedFloor]);
@@ -55,7 +54,6 @@ const TableManagementPage: React.FC = () => {
     
     // Nếu bàn đang dùng, load đơn hàng hiện tại của bàn đó
     if (table.status === 'inUse') {
-      console.log('Table is in use, loading current order for table:', table.number);
       
       // Tìm đơn hàng gần nhất của bàn này từ localStorage
       const allOrders = orderService.getAllOrders();
@@ -67,17 +65,14 @@ const TableManagementPage: React.FC = () => {
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
       
       if (currentOrder) {
-        console.log('Found current order:', currentOrder.orderNumber);
         // Load order KHÔNG hiển thị banner (fromSidebar = false)
         orderState.loadOrderFromHistory(currentOrder, false);
       } else {
-        console.log('No unpaid order found for this table');
         // Clear order nếu không tìm thấy (không hiển thị message)
         orderState.clearOrder(false);
       }
     } else {
       // Bàn trống hoặc đã đặt - clear order (không hiển thị message)
-      console.log('Table is empty/reserved, clearing order');
       orderState.clearOrder(false);
     }
   };
@@ -94,7 +89,6 @@ const TableManagementPage: React.FC = () => {
     
     if (orderState.currentOrder && orderState.currentOrder.id) {
       // Cập nhật đơn hàng hiện tại
-      console.log('Auto-updating order before payment:', orderState.currentOrder.orderNumber);
       orderService.updateOrder(orderState.currentOrder.id, {
         items: orderState.orderItems,
         total: total,
@@ -103,7 +97,6 @@ const TableManagementPage: React.FC = () => {
       });
     } else {
       // Tạo đơn hàng mới
-      console.log('Auto-creating order before payment');
       const newOrder = orderService.saveOrder({
         tableId: selectedTable.id,
         tableName: selectedTable.number,
@@ -137,7 +130,6 @@ const TableManagementPage: React.FC = () => {
   };
 
   const handlePaymentSuccess = async (paymentData: any) => {
-    console.log('Payment success, updating order status...', paymentData);
     
     // Cập nhật trạng thái thanh toán của đơn hàng
     if (orderState.currentOrder && orderState.currentOrder.id) {
@@ -146,7 +138,6 @@ const TableManagementPage: React.FC = () => {
         'paid',
         paymentData.method
       );
-      console.log('Order payment status updated:', updatedOrder?.orderNumber);
     }
     
     // Đóng modal
@@ -164,13 +155,11 @@ const TableManagementPage: React.FC = () => {
   };
 
   const handleSelectHistoryOrder = (order: Order) => {
-    console.log('Selecting history order:', order.orderNumber);
     
     // Find and select the table from the order
     const orderTable = tables.find(t => t.id === order.tableId);
     
     if (orderTable) {
-      console.log('Found table for order:', orderTable.number);
       setSelectedTable(orderTable);
       setSelectedHistoryOrder(order);
       

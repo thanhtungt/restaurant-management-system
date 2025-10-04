@@ -52,7 +52,6 @@ const MenuPage: React.FC = () => {
           loading={loading}
           error={error}
           onAddItem={(item) => {
-            console.log('Added item:', item);
             // This will be handled by parent component in integration phase
           }}
         />

@@ -99,7 +99,6 @@ export const useOrder = (tableId?: string) => {
 
   // Load order from history sidebar - hiển thị banner trạng thái
   const loadOrderFromHistory = (order: Order, fromSidebar: boolean = true) => {
-    console.log('Loading order from history:', order.orderNumber, 'fromSidebar:', fromSidebar);
     setIsLoadingFromHistory(true); // Set flag
     setShowPaymentStatus(fromSidebar); // Chỉ hiển thị banner nếu từ sidebar
     setCurrentOrder(order);
@@ -181,7 +180,6 @@ export const useOrder = (tableId?: string) => {
     
     // Chỉ clear khi tableId thay đổi VÀ không phải từ history
     if (tableId && previousTableId !== tableId && !isLoadingFromHistory) {
-      console.log('Table changed from', previousTableId, 'to', tableId, '- clearing order');
       setOrderItems([]);
       setNotes('');
       setCurrentOrder(null);

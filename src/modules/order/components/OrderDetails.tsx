@@ -93,7 +93,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
     }
 
     try {
-      console.log('Saving order...', { table, items, total, currentOrder });
       
       const discountAmount = 30000; // Có thể thay đổi logic tính giảm giá
       
@@ -102,7 +101,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
       // Kiểm tra xem đã có đơn hàng hiện tại chưa
       if (currentOrder && currentOrder.id) {
         // CẬP NHẬT đơn hàng hiện tại
-        console.log('Updating existing order:', currentOrder.orderNumber);
         order = orderService.updateOrder(currentOrder.id, {
           items: items,
           total: total,
@@ -111,12 +109,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
         });
         
         if (order) {
-          console.log('Order updated successfully:', order.orderNumber);
           messageApi.success(`Đã cập nhật đơn hàng ${order.orderNumber} thành công!`);
         }
       } else {
         // TẠO MỚI đơn hàng
-        console.log('Creating new order for table:', table.number);
         order = orderService.saveOrder({
           tableId: table.id,
           tableName: table.number,
@@ -132,20 +128,17 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
           customerName: 'Lê Thị C',
         });
         
-        console.log('Order created successfully:', order.orderNumber);
         messageApi.success(`Đã lưu đơn hàng ${order.orderNumber} thành công!`);
       }
       
       // Cập nhật trạng thái bàn thành "đang dùng"
       const updatedTable = tableStorageService.updateTableStatus(table.id, 'inUse');
-      console.log('Table status updated to inUse:', updatedTable);
       
       // Gọi callback để refresh danh sách bàn
       if (onTableStatusChange) {
         onTableStatusChange();
       }
     } catch (error) {
-      console.error('Error saving order:', error);
       messageApi.error('Lỗi khi lưu đơn hàng: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };

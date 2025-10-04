@@ -24,7 +24,6 @@ const OrderHistorySidebar: React.FC<OrderHistorySidebarProps> = ({
   // Load orders khi component mount
   useEffect(() => {
     const allOrders = orderService.getAllOrders();
-    console.log('Initial orders loaded:', allOrders.length);
     setOrders(allOrders);
   }, []);
 
@@ -32,7 +31,6 @@ const OrderHistorySidebar: React.FC<OrderHistorySidebarProps> = ({
   useEffect(() => {
     if (visible) {
       const allOrders = orderService.getAllOrders();
-      console.log('Reloading orders on sidebar open:', allOrders.length);
       setOrders(allOrders);
     }
   }, [visible]);
