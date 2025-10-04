@@ -8,10 +8,10 @@ Hệ thống quản lý nhà hàng hiện đại với React + TypeScript + Ant 
 
 ---
 
-## 📋 Mục lục
+##  Mục lục
 
 - [Tính năng](#-tính-năng)
-- [Demo](#-demo)
+ [Demo](#-demo)-
 - [Cài đặt](#-cài-đặt)
 - [Cấu trúc dự án](#-cấu-trúc-dự-án)
 - [Documentation](#-documentation)
@@ -20,37 +20,20 @@ Hệ thống quản lý nhà hàng hiện đại với React + TypeScript + Ant 
 
 ---
 
-## ✨ Tính năng
+##  Tính năng
 
-### ✅ Đã hoàn thành:
-- 🎨 **Dashboard** - Thống kê doanh thu, nhập/xuất kho, biểu đồ
-- 🪑 **Quản lý bàn** - Theo dõi trạng thái bàn, sắp xếp theo tầng
-- 🍽️ **Menu** - Hiển thị món ăn, filter theo category, search
-- 🛒 **Order** - Thêm món, điều chỉnh số lượng, tính tổng tiền
-- 💳 **Payment** - 3 phương thức (Tiền mặt, Thẻ, Chuyển khoản)
-- 🎯 **Modern UI** - Theo thiết kế Figma, responsive, horizontal scroll
+###  Đã hoàn thành:
+-  **Dashboard** - Thống kê doanh thu, nhập/xuất kho, biểu đồ
+-  **Quản lý bàn** - Theo dõi trạng thái bàn, sắp xếp theo tầng
+-  **Menu** - Hiển thị món ăn, filter theo category, search
+-  **Order** - Thêm món, điều chỉnh số lượng, tính tổng tiền
+-  **Payment** - 3 phương thức (Tiền mặt, Thẻ, Chuyển khoản)
+-  **Modern UI** - Theo thiết kế Figma, responsive, horizontal scroll
 
-### 🔄 Đang phát triển:
-- 📄 Payment Receipt - In hóa đơn
-- 📊 Order History - Lịch sử đơn hàng
-- 👥 User Management - Quản lý nhân viên
-
+##  Demo
 ---
 
-## 🖼️ Demo
-
-### Dashboard
-![Dashboard](docs/images/dashboard.png)
-
-### Menu (Figma Design)
-![Menu](docs/images/menu-design.png)
-
-### Table Management
-![Tables](docs/images/tables.png)
-
----
-
-## 🚀 Cài đặt
+##  Cài đặt
 
 ### Yêu cầu:
 - Node.js >= 14
@@ -76,7 +59,7 @@ Mở [http://localhost:3000](http://localhost:3000) để xem ứng dụng.
 
 ---
 
-## 📂 Cấu trúc dự án
+##  Cấu trúc dự án
 
 ```
 src/
@@ -102,37 +85,23 @@ src/
 │   └── auth/              # Authentication
 │       └── pages/         # LoginPage
 ├── services/
-│   └── apiService.ts      # ⭐ Mock data & API handler
+│   └── apiService.ts      #  Mock data & API handler
 ├── types/                 # TypeScript interfaces
 ├── config/                # Configuration
 ├── routes/                # React Router setup
 └── components/            # Shared components
 
 public/
-└── menu/                  # ⭐ Menu images
+└── menu/                  #  Menu images
 ```
 
 ---
 
-## 📚 Documentation
-
-Đầy đủ tài liệu trong folder gốc:
-
-### 🎯 Bắt đầu nhanh:
-- **[INDEX.md](INDEX.md)** - Danh mục tất cả tài liệu
-- **[MENU_LOCATION_SUMMARY.md](MENU_LOCATION_SUMMARY.md)** ⭐ - Món ăn nằm ở đâu?
-- **[MENU_DATA_QUICK_GUIDE.md](MENU_DATA_QUICK_GUIDE.md)** ⚡ - Thêm món ăn trong 3 bước
-
-### 📖 Chi tiết:
-- **[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)** - Kế hoạch phát triển
-- **[COMPLETED_MODULES.md](COMPLETED_MODULES.md)** - Đã hoàn thành
-- **[MENU_DESIGN_UPDATE.md](MENU_DESIGN_UPDATE.md)** - UI/UX design specs
-- **[WHERE_ARE_MENU_DATA.md](WHERE_ARE_MENU_DATA.md)** - Chi tiết data structure
-- **[MENU_FLOW_DIAGRAM.md](MENU_FLOW_DIAGRAM.md)** - Sơ đồ luồng dữ liệu
+##  Documentation
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend:
 - **React** 19.1.1 - UI framework
@@ -151,7 +120,7 @@ public/
 
 ---
 
-## 📜 Scripts
+##  Scripts
 
 ### Development
 ```bash
@@ -173,7 +142,7 @@ npm run format     # Format code
 
 ---
 
-## 🎨 Thêm món ăn mới
+##  Thêm món ăn mới
 
 ### Bước 1: Edit mock data
 File: `src/services/apiService.ts` (dòng ~85)
@@ -206,30 +175,26 @@ if (url.includes(API_ENDPOINTS.menu)) {
 npm start
 ```
 
-Chi tiết xem: [MENU_DATA_QUICK_GUIDE.md](MENU_DATA_QUICK_GUIDE.md)
+---
+
+##  Contributing
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please read [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) for development guidelines.
-
----
-
-## 📄 License
+##  License
 
 This project is licensed under the MIT License.
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
 **thanhtungt**  
 GitHub: [@thanhtungt](https://github.com/thanhtungt)
 
 ---
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - Design inspired by modern POS systems
 - UI components from [Ant Design](https://ant.design/)
@@ -237,7 +202,7 @@ GitHub: [@thanhtungt](https://github.com/thanhtungt)
 
 ---
 
-**🎉 Happy coding!**
+** Happy coding!**
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
