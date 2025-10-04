@@ -114,7 +114,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           <div>
             <p style={{ 
               fontSize: '14px', 
-              color: '#8c8c8c',
+              color: '#707070',
               marginBottom: '16px',
             }}>
               Vui lòng chọn phương thức thanh toán
@@ -128,29 +128,35 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               <Option value="Tiền mặt">Tiền mặt</Option>
               <Option value="Chuyển khoản">Chuyển khoản</Option>
             </Select>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <Button 
-                size="large" 
-                block
+                size="small"
                 onClick={handleCancel}
                 style={{ 
                   height: '44px',
-                  fontSize: '15px',
+                  fontSize: '14px',
                   borderRadius: '8px',
+                  border: '1px solid #0088FF',
+                  color: '#0088FF',
+                  fontWeight: '700',
+                  paddingLeft: '24px',
+                  paddingRight: '24px',
                 }}
               >
                 Hủy
               </Button>
               <Button 
                 type="primary" 
-                size="large" 
-                block
+                size="small"
                 onClick={handleContinue}
                 loading={loading}
                 style={{ 
                   height: '44px',
-                  fontSize: '15px',
+                  fontSize: '14px',
                   borderRadius: '8px',
+                  fontWeight: '700',
+                  paddingLeft: '24px',
+                  paddingRight: '24px',
                 }}
               >
                 Tiếp tục
@@ -169,8 +175,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               style={{ width: '100%', marginBottom: '20px' }}
             />
             <p style={{ 
-              fontSize: '14px', 
-              color: '#8c8c8c',
+              fontSize: '15px', 
+              color: '#707070',
               marginBottom: '16px',
               textAlign: 'center',
             }}>
@@ -192,42 +198,49 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               Mã QR ở đây
             </div>
             <div style={{ 
-              textAlign: 'center',
+              textAlign: 'right',
               fontSize: '16px',
               marginBottom: '24px',
             }}>
-              <span style={{ color: '#595959' }}>Tổng : </span>
+              <span style={{ color: '#000000' }}>Tổng : </span>
               <span style={{ 
-                color: '#1890ff',
-                fontWeight: '600',
-                fontSize: '18px',
+                color: '#0094FE',
+                fontWeight: '400',
+                fontSize: '20px',
               }}>
                 {total.toLocaleString('vi-VN')}₫
               </span>
             </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <Button 
-                size="large" 
-                block
+                size="small"
                 onClick={handleCancel}
                 style={{ 
                   height: '44px',
-                  fontSize: '15px',
+                  fontSize: '14px',
                   borderRadius: '8px',
+                  paddingLeft: '24px',
+                  paddingRight: '24px',
+                  border: '1px solid #0088FF',
+                  color: '#0088FF',
+                  fontWeight: '700',
                 }}
               >
                 Hủy
               </Button>
               <Button 
                 type="primary" 
-                size="large" 
-                block
+                size="small"
                 onClick={handleConfirm}
                 loading={loading}
                 style={{ 
                   height: '44px',
-                  fontSize: '15px',
+                  fontSize: '14px',
                   borderRadius: '8px',
+                  paddingLeft: '24px',
+                  paddingRight: '24px',
+                  background: '#0088FF',
+                  fontWeight: '700',
                 }}
               >
                 Tiếp tục
@@ -247,9 +260,9 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             />
             <div style={{ marginBottom: '20px' }}>
               <p style={{ 
-                color: '#52c41a',
-                fontSize: '16px',
-                fontWeight: '600',
+                color: '#14933E',
+                fontSize: '15px',
+                fontWeight: '700',
                 marginBottom: '24px',
               }}>
                 Thanh toán thành công!
@@ -259,17 +272,18 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                 height: '120px',
                 margin: '0 auto 20px',
                 borderRadius: '50%',
-                border: '6px solid #52c41a',
+                border: '6px solid #27C840',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
+                background: '#E5FBD8',
               }}>
                 <div style={{
                   width: '60px',
                   height: '30px',
-                  borderBottom: '6px solid #52c41a',
-                  borderLeft: '6px solid #52c41a',
+                  borderBottom: '6px solid #27C840',
+                  borderLeft: '6px solid #27C840',
                   transform: 'rotate(-45deg)',
                   marginTop: '-10px',
                   marginLeft: '5px',
@@ -277,32 +291,37 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               </div>
             </div>
             <div style={{ 
+              textAlign: 'right',
               fontSize: '16px',
               marginBottom: '30px',
             }}>
-              <span style={{ color: '#595959' }}>Tổng : </span>
+              <span style={{ color: '#000000' }}>Tổng : </span>
               <span style={{ 
-                color: '#1890ff',
-                fontWeight: '600',
-                fontSize: '18px',
+                color: '#0094FE',
+                fontWeight: '400',
+                fontSize: '20px',
               }}>
                 {total.toLocaleString('vi-VN')}₫
               </span>
             </div>
-            <Button 
-              type="primary" 
-              size="large" 
-              block
-              onClick={handleExit}
-              style={{ 
-                height: '44px',
-                fontSize: '15px',
-                borderRadius: '8px',
-                background: '#1890ff',
-              }}
-            >
-              Thoát
-            </Button>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button 
+                type="primary" 
+                size="small"
+                onClick={handleExit}
+                style={{ 
+                  height: '44px',
+                  fontSize: '14px',
+                  borderRadius: '8px',
+                  background: '#0088FF',
+                  fontWeight: '700',
+                  paddingLeft: '24px',
+                  paddingRight: '24px',
+                }}
+              >
+                Thoát
+              </Button>
+            </div>
           </div>
         );
 
@@ -317,9 +336,9 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             />
             <div style={{ marginBottom: '20px' }}>
               <p style={{ 
-                color: '#ff4d4f',
-                fontSize: '16px',
-                fontWeight: '600',
+                color: '#FF5F57',
+                fontSize: '15px',
+                fontWeight: '700',
                 marginBottom: '24px',
               }}>
                 Thanh toán thất bại
@@ -329,7 +348,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                 height: '120px',
                 margin: '0 auto 20px',
                 borderRadius: '50%',
-                border: '6px solid #ff4d4f',
+                border: '6px solid #FF0005',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -339,14 +358,14 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                   position: 'absolute',
                   width: '70px',
                   height: '6px',
-                  background: '#ff4d4f',
+                  background: '#FF0005',
                   transform: 'rotate(45deg)',
                 }}></div>
                 <div style={{
                   position: 'absolute',
                   width: '70px',
                   height: '6px',
-                  background: '#ff4d4f',
+                  background: '#FF0005',
                   transform: 'rotate(-45deg)',
                 }}></div>
               </div>
@@ -354,40 +373,46 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             <div style={{ 
               fontSize: '16px',
               marginBottom: '30px',
+              textAlign: 'right',
             }}>
-              <span style={{ color: '#595959' }}>Tổng : </span>
+              <span style={{ color: '#000000' }}>Tổng : </span>
               <span style={{ 
-                color: '#1890ff',
-                fontWeight: '600',
-                fontSize: '18px',
+                color: '#0094FE',
+                fontWeight: '400',
+                fontSize: '20px',
               }}>
                 {total.toLocaleString('vi-VN')}₫
               </span>
             </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <Button 
-                size="large" 
-                block
+                size="small"
                 onClick={handleRetry}
                 style={{ 
                   height: '44px',
-                  fontSize: '15px',
+                  fontSize: '14px',
                   borderRadius: '8px',
-                  border: '1px solid #d9d9d9',
+                  border: '1px solid #5296E5',
+                  paddingLeft: '24px',
+                  paddingRight: '24px',
+                  color: '#5296E5',
+                  fontWeight: '700',
                 }}
               >
                 Thử lại
               </Button>
               <Button 
                 type="primary" 
-                size="large" 
-                block
+                size="small"
                 onClick={handleExit}
                 style={{ 
                   height: '44px',
-                  fontSize: '15px',
+                  fontSize: '14px',
                   borderRadius: '8px',
-                  background: '#1890ff',
+                  background: '#0088FF',
+                  paddingLeft: '24px',
+                  paddingRight: '24px',
+                  fontWeight: '700',
                 }}
               >
                 Thoát

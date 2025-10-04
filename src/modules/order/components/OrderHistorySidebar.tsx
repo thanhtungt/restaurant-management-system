@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Drawer, Card, Tag, Input, Button } from 'antd';
-import { SearchOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, CloseOutlined } from '@ant-design/icons';
+import { Drawer, Card, Tag, Input, Button, DatePicker, Divider } from 'antd';
+import { SearchOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, CloseOutlined, CalendarOutlined } from '@ant-design/icons';
 import { Order } from '../../../types/order';
 import { orderService } from '../../../services/orderService';
+import dayjs from 'dayjs';
 
 interface OrderHistorySidebarProps {
   visible: boolean;
@@ -18,6 +19,7 @@ const OrderHistorySidebar: React.FC<OrderHistorySidebarProps> = ({
   const [orders, setOrders] = useState<Order[]>([]);
   const [searchText, setSearchText] = useState('');
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(dayjs());
 
   // Load orders khi component mount
   useEffect(() => {
@@ -38,7 +40,7 @@ const OrderHistorySidebar: React.FC<OrderHistorySidebarProps> = ({
   const getPaymentStatusColor = (status: string) => {
     switch (status) {
       case 'paid':
-        return '#52c41a';
+        return '#27C840';
       case 'failed':
         return '#ff4d4f';
       case 'unpaid':
@@ -74,7 +76,7 @@ const OrderHistorySidebar: React.FC<OrderHistorySidebarProps> = ({
     <Drawer
       title={
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '20px', fontWeight: '700', color: '#262626' }}>
+          <span style={{ fontSize: '24px', fontWeight: '700', color: '#222222' }}>
             Tìm kiếm đơn hàng
           </span>
         </div>
@@ -94,49 +96,72 @@ const OrderHistorySidebar: React.FC<OrderHistorySidebarProps> = ({
     >
       {/* Search Box */}
       <div style={{ marginBottom: '16px' }}>
-        <Input
-          placeholder="Tìm kiếm đơn hàng..."
+        <Input  
           prefix={<SearchOutlined style={{ color: '#000000' }} />}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           size="large"
           style={{
-            borderRadius: '8px',
+            borderRadius: '16px',
+            border: '1px solid #0088FF87',
           }}
         />
       </div>
 
-      {/* Time Filter Buttons */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-        <Button
-          type="primary"
-          size="middle"
+      {/* Date and Time Filter */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Date Filter - Left with icon prefix */}
+        <DatePicker
+          value={selectedDate}
+          onChange={(date) => setSelectedDate(date)}
+          format="DD/MM/YYYY"
+          size="large"
+          suffixIcon={null}
           style={{
-            background: '#faad14',
-            borderColor: '#faad14',
-            borderRadius: '8px',
-            fontWeight: '600',
-            flex: 1,
+            borderRadius: '12px',
+            width: '160px',
+            fontWeight: '700',
           }}
-        >
-          {new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-        </Button>
-        <Button
-          danger
-          size="middle"
-          style={{
-            borderRadius: '8px',
-            fontWeight: '600',
-            flex: 1,
-          }}
-        >
-          {new Date(Date.now() + 3600000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-        </Button>
+          prefix={<CalendarOutlined style={{ color: '#0088FF', marginRight: '8px' }} />}
+        />
+        
+        {/* Time Filter Buttons - Right */}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button
+            size="large"
+            style={{
+              background: '#FF9D00',
+              borderColor: '#FF9D00',
+              color: '#FFFFFF',
+              borderRadius: '12px',
+              fontWeight: '700',
+              minWidth: '90px',
+            }}
+          >
+            17:09:22
+          </Button>
+          <Button
+            size="large"
+            style={{
+              background: '#F90000',
+              borderColor: '#FF0000',
+              color: '#FFFFFF',
+              borderRadius: '12px',
+              fontWeight: '700',
+              minWidth: '90px',
+            }}
+          >
+            18:09:22
+          </Button>
+        </div>
       </div>
+
+      {/* Divider Line */}
+      <Divider style={{ margin: '20px 0', borderColor: '#D9D9D9' }} />
 
       {/* Section Title */}
       <div style={{ marginBottom: '12px' }}>
-        <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#262626', margin: 0 }}>
+        <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#222222', margin: 0 }}>
           Gần đây
         </h3>
       </div>
@@ -149,6 +174,7 @@ const OrderHistorySidebar: React.FC<OrderHistorySidebarProps> = ({
               borderRadius: '12px',
               textAlign: 'center',
               padding: '40px 20px',
+              
             }}
           >
             <p style={{ margin: 0, color: '#8c8c8c', fontSize: '14px' }}>
@@ -170,28 +196,29 @@ const OrderHistorySidebar: React.FC<OrderHistorySidebarProps> = ({
               bodyStyle={{ padding: '16px' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div>
-                    <div style={{ fontSize: '15px', fontWeight: '700', color: '#262626', marginBottom: '4px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '15px', fontWeight: '700', color: '#262626' }}>
                       {order.orderNumber}
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#8c8c8c' }}>
-                      {order.createdAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                    </div>
+                    </span>
+                    <Tag
+                      style={{
+                        background: '#0094FE',
+                        color: '#FFFFFF',
+                        borderRadius: '12px',
+                        padding: '2px 8px',
+                        fontSize: '11px',
+                        fontWeight: '700',
+                        border: 'none',
+                        margin: 0,
+                      }}
+                    >
+                      {order.tableName}
+                    </Tag>
                   </div>
-                  
-                  <Tag
-                    color="blue"
-                    style={{
-                      borderRadius: '12px',
-                      padding: '2px 10px',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      border: 'none',
-                    }}
-                  >
-                    {order.tableName}
-                  </Tag>
+                  <div style={{ fontSize: '14px', color: '#000000', fontWeight: '700' }}>
+                    {order.createdAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                  </div>
                 </div>
 
                 <div style={{ textAlign: 'right' }}>
@@ -204,12 +231,12 @@ const OrderHistorySidebar: React.FC<OrderHistorySidebarProps> = ({
                     >
                       {getPaymentStatusIcon(order.paymentStatus)}
                     </span>
-                    <span style={{ fontSize: '12px', color: '#8c8c8c' }}>
+                    <span style={{ fontSize: '14px', color: '#000000', fontWeight: '700' }}>
                       {order.createdAt.toLocaleDateString('vi-VN')}
                     </span>
                   </div>
-                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#0088FF' }}>
-                    {order.finalTotal.toLocaleString('vi-VN')}₫
+                  <div style={{fontWeight: '700' }}>
+                    <span style={{ fontSize: '14px', color: '#000000' }}>Giá:</span> <span style={{fontSize: '20px', color: '#0088FF' }}>{order.finalTotal.toLocaleString('vi-VN')}₫</span>
                   </div>
                 </div>
               </div>

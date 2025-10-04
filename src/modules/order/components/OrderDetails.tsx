@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Empty, Divider, Space, message, App } from 'antd';
-import { ShoppingCartOutlined, ClearOutlined, PrinterOutlined, CalendarOutlined, ClockCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { ShoppingCartOutlined, ClearOutlined, PrinterOutlined, CalendarOutlined, ClockCircleOutlined, ArrowLeftOutlined, CheckCircleOutlined, CloseSquareOutlined } from '@ant-design/icons';
 import { Table } from '../../../types/table';
 import { OrderItem } from '../../../types/order';
 import OrderItemComponent from './OrderItemComponent';
@@ -59,11 +59,11 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
         border-radius: 3px;
       }
       .order-items-scroll::-webkit-scrollbar-thumb {
-        background: #0088FF;
+        background: #D5D5D5;
         border-radius: 3px;
       }
       .order-items-scroll::-webkit-scrollbar-thumb:hover {
-        background: #0066CC;
+        background: #BFBFBF;
       }
     `;
     document.head.appendChild(style);
@@ -167,14 +167,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
           margin: '0 0 16px 0', 
           fontSize: '24px', 
           fontWeight: '700',
-          color: '#262626',
+          color: '#222222',
         }}>
           Đơn hàng
         </h2>
         <p style={{
           margin: 0,
           fontSize: '14px',
-          color: '#8c8c8c',
+          fontWeight: '400',
+          color: '#948B8B',
           textAlign: 'center',
         }}>
           Vui lòng chọn bàn để bắt đầu tạo đơn hàng
@@ -188,189 +189,194 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
     <div style={{ 
       height: '100%', 
       background: '#fff',
-      padding: '24px',
+      padding: '20px',
       display: 'flex',
       flexDirection: 'column',
       borderRadius: '20px',
+      overflow: 'hidden',
     }}>
       {/* Header Title */}
       <h2 style={{ 
-        margin: '0 0 20px 0',
+        margin: '0 0 16px 0',
         fontSize: '24px',
         fontWeight: '700',
-        color: '#262626',
+        color: '#222222',
         textAlign: 'center',
+        flexShrink: 0,
       }}>
         Đơn hàng
       </h2>
 
-        {/* Order Info Box */}
+        {/* Order Info Box - Bao gồm tất cả thông tin */}
         <div style={{
-          padding: '16px',
-          background: '#fafafa',
-          borderRadius: '12px',
-          border: '1px dashed #d9d9d9',
-          marginBottom: '20px',
+          padding: '12px 16px',
+          background: '#FFFFFF',
+          borderRadius: '8px',
+          border: '1px dashed #D9D9D9',
+          marginBottom: '16px',
+          flex: 1,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
         }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {/* Thông tin đơn hàng */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Ngày tạo đơn:</span>
-              <span style={{ fontSize: '14px', fontWeight: '500', color: '#262626' }}>{formatDate(currentTime)}</span>
+              <span style={{ fontSize: '14px', fontWeight: '700', color: '#000000' }}>Ngày tạo đơn:</span>
+              <span style={{ fontSize: '14px', fontWeight: '400', color: '#000000' }}>{formatDate(currentTime)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Thời điểm:</span>
-              <span style={{ fontSize: '14px', fontWeight: '500', color: '#262626' }}>{formatTime(currentTime)}</span>
+              <span style={{ fontSize: '14px', fontWeight: '700', color: '#000000' }}>Thời điểm:</span>
+              <span style={{ fontSize: '14px', fontWeight: '400', color: '#000000' }}>{formatTime(currentTime)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Khách hàng:</span>
-              <span style={{ fontSize: '14px', fontWeight: '500', color: '#262626' }}>Lê Thị C</span>
+              <span style={{ fontSize: '14px', fontWeight: '700', color: '#000000' }}>Khách hàng:</span>
+              <span style={{ fontSize: '14px', fontWeight: '400', color: '#000000' }}>Lê Thị C</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Nhân viên:</span>
-              <span style={{ fontSize: '14px', fontWeight: '500', color: '#262626' }}>Trần Văn B</span>
+              <span style={{ fontSize: '14px', fontWeight: '700', color: '#000000' }}>Nhân viên:</span>
+              <span style={{ fontSize: '14px', fontWeight: '400', color: '#000000' }}>Trần Văn B</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '14px', fontWeight: '600', color: '#595959' }}>Bàn:</span>
+              <span style={{ fontSize: '14px', fontWeight: '700', color: '#000000' }}>Bàn:</span>
               <span style={{ 
-                padding: '4px 12px',
-                background: '#1890ff',
-                color: '#fff',
+                padding: '2px 12px',
+                background: '#5296E5',
+                color: '#FFFFFF',
                 borderRadius: '12px',
-                fontSize: '13px',
-                fontWeight: '600',
+                fontSize: '14px',
+                fontWeight: '400',
               }}>
-                {table.number} Tầng {selectedFloor}
+                {table.number} | Tầng {selectedFloor}
               </span>
             </div>
           </div>
-        </div>
 
-        {/* Items List */}
-        <div 
-          style={{ 
-            flex: 1, 
-            overflowY: 'auto', 
-            marginBottom: '16px',
-            paddingRight: '8px',
-            minHeight: 0,
-          }}
-          className="order-items-scroll"
-        >
-          {items.map((item) => (
-            <OrderItemComponent
-              key={item.menuItem.id}
-              item={item}
-              onUpdateQuantity={onUpdateQuantity}
-              onRemove={onRemoveItem}
-            />
-          ))}
-        </div>
+          {/* Đường line phân chia trên món ăn */}
+          <Divider style={{ margin: '12px 0', borderColor: '#D9D9D9' }} />
 
-        {/* Total Section */}
-        <div style={{ 
-          padding: '16px',
-          marginBottom: '16px',
-          background: '#fafafa',
-          borderRadius: '12px',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <span style={{ fontSize: '14px', fontWeight: '500', color: '#595959' }}>Tạm tính:</span>
-            <span style={{ fontSize: '16px', fontWeight: '600', color: '#0088FF' }}>
-              {total.toLocaleString('vi-VN')}₫
-            </span>
+          {/* Items List - Nằm trong box */}
+          <div 
+            style={{ 
+              flex: 1,
+              overflowY: 'auto', 
+              marginBottom: '12px',
+              paddingRight: '8px',
+              minHeight: 0,
+            }}
+            className="order-items-scroll"
+          >
+            {items.map((item) => (
+              <OrderItemComponent
+                key={item.menuItem.id}
+                item={item}
+                onUpdateQuantity={onUpdateQuantity}
+                onRemove={onRemoveItem}
+              />
+            ))}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '14px', fontWeight: '500', color: '#595959' }}>Giảm giá:</span>
-              <span style={{ 
-                padding: '4px 12px',
-                background: '#fff',
-                color: '#2A3256',
-                borderRadius: '12px',
-                fontSize: '12px',
-                fontWeight: '600',
-                border: '1px solid #D7D7D7',
-              }}>
-                XVYZ6H
+
+          {/* Đường line phân chia dưới món ăn */}
+          <Divider style={{ margin: '12px 0', borderColor: '#D9D9D9' }} />
+
+          {/* Total Section - Nằm trong box */}
+          <div style={{ flexShrink: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontSize: '14px', fontWeight: '500', color: '#2A3256' }}>Tạm tính:</span>
+              <span style={{ fontSize: '14px', fontWeight: '500', color: '#0088FF' }}>
+                {total.toLocaleString('vi-VN')}đ
               </span>
             </div>
-            <div style={{ fontSize: '14px', fontWeight: '600', color: '#FF6F68' }}>
-              -30.000₫
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '14px', fontWeight: '500', color: '#2A3256' }}>Giảm giá:</span>
+                <span style={{ 
+                  padding: '2px 8px',
+                  // background: '#D7D7D7',
+                  color: '#000000',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  border: '1px solid #D7D7D7',
+                }}>
+                  XVYZ6H
+                </span>
+              </div>
+              <div style={{ fontSize: '14px', fontWeight: '500', color: '#FF6F68' }}>
+                -30.000đ
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', marginTop: '8px' }}>
+              <span style={{ fontSize: '14px', fontWeight: '500', color: '#2A3256' }}>Tổng:</span>
+              <span style={{ fontSize: '20px', fontWeight: '500', color: '#14933E' }}>
+                {(total - 30000).toLocaleString('vi-VN')}đ
+              </span>
+            </div>
+            <div style={{ marginTop: '4px', fontSize: '14px', color: '#222222'}}>
+              <span style={{ fontWeight: '700' }}>Phương thức thanh toán:</span> <span>{currentOrder?.paymentMethod === 'cash' ? 'Tiền mặt' : currentOrder?.paymentMethod === 'transfer' ? 'Chuyển khoản' : 'chưa có'}</span>
             </div>
           </div>
-          <Divider style={{ margin: '12px 0' }} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '16px', fontWeight: '700', color: '#262626' }}>Tổng:</span>
-            <span style={{ fontSize: '24px', fontWeight: '700', color: '#52c41a' }}>
-              {(total - 30000).toLocaleString('vi-VN')}₫
-            </span>
-          </div>
-          <div style={{ marginTop: '8px', fontSize: '13px', color: '#8c8c8c' }}>
-            <span style={{ fontWeight: '600' }}>Phương thức thanh toán:</span> {currentOrder?.paymentMethod || 'Tiền mặt'}
-          </div>
         </div>
-
-        {/* Payment Status Banner - Chỉ hiển thị khi chọn từ đơn hàng trước đó */}
-        {currentOrder && showPaymentStatus && (
-          <div style={{
-            padding: '12px 16px',
-            marginBottom: '16px',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: currentOrder.paymentStatus === 'paid' ? '#f6ffed' : '#fff2e8',
-            border: `1px solid ${currentOrder.paymentStatus === 'paid' ? '#b7eb8f' : '#ffbb96'}`,
-          }}>
-            {currentOrder.paymentStatus === 'paid' ? (
-              <>
-                <span style={{ fontSize: '18px' }}>✓</span>
-                <span style={{ 
-                  fontSize: '14px', 
-                  fontWeight: '600',
-                  color: '#52c41a',
-                }}>
-                  Thanh Toán Thành Công!
-                </span>
-              </>
-            ) : (
-              <>
-                <span style={{ fontSize: '18px', color: '#ff4d4f' }}>✕</span>
-                <span style={{ 
-                  fontSize: '14px', 
-                  fontWeight: '600',
-                  color: '#ff4d4f',
-                }}>
-                  Chưa Thanh Toán
-                </span>
-              </>
-            )}
-          </div>
-        )}
 
         {/* Action Buttons */}
         {showPaymentStatus ? (
-          // Khi xem đơn hàng từ lịch sử - chỉ hiển thị button "Xuất hóa đơn"
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          // Khi xem đơn hàng từ lịch sử - hiển thị status và button trên cùng 1 hàng
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexShrink: 0 }}>
+            {/* Payment Status - Left */}
+            {currentOrder && (
+              <div style={{
+                padding: '12px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                flex: 1,
+              }}>
+                {currentOrder.paymentStatus === 'paid' ? (
+                  <>
+                    <CheckCircleOutlined style={{ fontSize: '18px', color: '#14933E' }} />
+                    <span style={{ 
+                      fontSize: '14px', 
+                      fontWeight: '700',
+                      color: '#14933E',
+                    }}>
+                      Thanh Toán Thành Công!
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <CloseSquareOutlined style={{ fontSize: '18px', color: '#FF6F68' }} />
+                    <span style={{ 
+                      fontSize: '14px', 
+                      fontWeight: '700',
+                      color: '#FF6F68',
+                    }}>
+                      Chưa Thanh Toán
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
+            
+            {/* Button "Xuất hóa đơn" - Right */}
             <Button
-              size="large"
-              block
+              size="small"
               style={{
                 height: '48px',
-                fontSize: '15px',
-                fontWeight: '600',
-                background: '#1890ff',
-                borderColor: '#1890ff',
-                color: '#fff',
+                fontSize: '17px',
+                fontWeight: '700',
+                background: '#141A93',
+                borderColor: '#141A93',
+                color: '#FFFFFF',
                 borderRadius: '8px',
+                minWidth: '150px',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#40a9ff';
-                e.currentTarget.style.borderColor = '#40a9ff';
+                e.currentTarget.style.background = '#141A93';
+                e.currentTarget.style.borderColor = '#141A93';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#1890ff';
-                e.currentTarget.style.borderColor = '#1890ff';
+                e.currentTarget.style.background = '#141A93';
+                e.currentTarget.style.borderColor = '#141A93';
               }}
             >
               Xuất hóa đơn
@@ -378,20 +384,20 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
           </div>
         ) : (
           // Khi tạo/chỉnh sửa đơn hàng - hiển thị tất cả buttons
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flexShrink: 0 }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
               <Button
                 size="large"
                 block
                 onClick={handleSaveOrder}
                 style={{
-                  height: '48px',
-                  fontSize: '15px',
-                  fontWeight: '600',
+                  height: '44px',
+                  fontSize: '14px',
+                  fontWeight: '700',
                   borderRadius: '8px',
-                  border: '1px solid #d9d9d9',
-                  background: '#fff',
-                  color: '#262626',
+                  border: '1px solid #5296E5',
+                  background: '#FFFFFF',
+                  color: '#222222',
                 }}
               >
                 Lưu
@@ -400,38 +406,38 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                 size="large"
                 block
                 style={{
-                  height: '48px',
-                  fontSize: '15px',
-                  fontWeight: '600',
+                  height: '44px',
+                  fontSize: '14px',
+                  fontWeight: '700',
                   borderRadius: '8px',
-                  border: '1px solid #d9d9d9',
-                  background: '#fff',
-                  color: '#262626',
+                  border: '1px solid #5296E5',
+                  background: '#FFFFFF',
+                  color: '#222222',
                 }}
               >
                 Hủy
               </Button>
             </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
               <Button
                 size="large"
                 block
                 style={{
-                  height: '48px',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  background: '#52c41a',
-                  borderColor: '#52c41a',
-                  color: '#fff',
+                  height: '44px',
+                  fontSize: '14px',
+                  fontWeight: '700',
+                  background: '#14933E',
+                  borderColor: '#14933E',
+                  color: '#FFFFFF',
                   borderRadius: '8px',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#73d13d';
-                  e.currentTarget.style.borderColor = '#73d13d';
+                  e.currentTarget.style.background = '#14933E';
+                  e.currentTarget.style.borderColor = '#14933E';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#52c41a';
-                  e.currentTarget.style.borderColor = '#52c41a';
+                  e.currentTarget.style.background = '#14933E';
+                  e.currentTarget.style.borderColor = '#14933E';
                 }}
               >
                 Xuất hóa đơn
@@ -441,12 +447,22 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                 size="large"
                 block
                 onClick={onPayment}
-                danger
                 style={{
-                  height: '48px',
-                  fontSize: '15px',
-                  fontWeight: '600',
+                  height: '44px',
+                  fontSize: '14px',
+                  fontWeight: '700',
                   borderRadius: '8px',
+                  background: '#FF5F57',
+                  borderColor: '#FF5F57',
+                  color: '#FFFFFF',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#FF5F57';
+                  e.currentTarget.style.borderColor = '#FF5F57';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#FF5F57';
+                  e.currentTarget.style.borderColor = '#FF5F57';
                 }}
               >
                 Thanh Toán

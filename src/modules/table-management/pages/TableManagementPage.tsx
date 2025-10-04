@@ -22,11 +22,21 @@ const TableManagementPage: React.FC = () => {
   const [paymentModalVisible, setPaymentModalVisible] = useState(false);
   const [orderHistorySidebarVisible, setOrderHistorySidebarVisible] = useState(false);
   const [selectedHistoryOrder, setSelectedHistoryOrder] = useState<Order | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
   
   // Use custom hooks
   const menuState = useMenu();
   const orderState = useOrder(selectedTable?.id);
   const { tables, loading: tablesLoading, refreshTables } = useTables();
+
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   // Auto-select bàn B1 (bàn đầu tiên ở tầng 1) khi page load
   useEffect(() => {
@@ -513,13 +523,13 @@ const TableManagementPage: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <CalendarOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
                 <span style={{ fontSize: '14px', fontWeight: '500' }}>
-                  {new Date().toLocaleDateString('vi-VN')}
+                  {currentTime.toLocaleDateString('vi-VN')}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <ClockCircleOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
                 <span style={{ fontSize: '14px', fontWeight: '500' }}>
-                  {new Date().toLocaleTimeString('vi-VN')}
+                  {currentTime.toLocaleTimeString('vi-VN')}
                 </span>
               </div>
             </Card>

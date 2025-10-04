@@ -158,20 +158,19 @@ const OrderHistoryPage: React.FC = () => {
             }}
             bodyStyle={{ padding: '20px 24px' }}
           >
-            <h1 style={{ margin: '0 0 20px 0', fontSize: '28px', fontWeight: '700', color: '#262626' }}>
+            <h1 style={{ margin: '0 0 20px 0', fontSize: '24px', fontWeight: '700', color: '#222222' }}>
               Tìm kiếm đơn hàng
             </h1>
             
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <Input
-                placeholder="Tìm kiếm đơn hàng..."
                 prefix={<SearchOutlined style={{ color: '#000000' }} />}
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 size="large"
                 style={{
                   flex: 1,
-                  borderRadius: '8px',
+                  borderRadius: '16px',
                 }}
               />
               <Button

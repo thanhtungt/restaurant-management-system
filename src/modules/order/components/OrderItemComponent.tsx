@@ -46,7 +46,7 @@ const OrderItemComponent: React.FC<OrderItemComponentProps> = ({
         style={{
           width: '60px',
           height: '60px',
-          borderRadius: '8px',
+          borderRadius: '20px',
           overflow: 'hidden',
           flexShrink: 0,
           background: '#f0f0f0',
@@ -90,23 +90,23 @@ const OrderItemComponent: React.FC<OrderItemComponentProps> = ({
           }}
         >
           <span style={{
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#262626',
+            fontSize: '16px',
+            fontWeight: '700',
+            color: '#2A3256',
           }}>
             {item.menuItem.name}
           </span>
           <span style={{
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#262626',
+            fontSize: '16px',
+            fontWeight: '700',
+            color: '#2A3256',
           }}>
             -
           </span>
           <span style={{ 
             fontSize: '13px', 
-            fontWeight: '600',
-            color: '#ff8800',
+            fontWeight: '500',
+            color: '#FF8D28',
           }}>
             {item.menuItem.price.toLocaleString('vi-VN')}₫
           </span>
@@ -134,15 +134,15 @@ const OrderItemComponent: React.FC<OrderItemComponentProps> = ({
               height: '22px',
               borderRadius: '50%',
               padding: 0,
-              background: '#1890ff',
-              borderColor: '#1890ff',
+              background: '#0D62CA',
+              borderColor: '#1A72DD',
             }}
           />
           <span
             style={{
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#262626',
+              fontSize: '16px',
+              fontWeight: '400',
+              color: '#000000',
               minWidth: '20px',
               textAlign: 'center',
             }}
@@ -152,7 +152,7 @@ const OrderItemComponent: React.FC<OrderItemComponentProps> = ({
           <Button
             type="primary"
             size="small"
-            icon={<PlusOutlined style={{ fontSize: '8px' }} />}
+            icon={<PlusOutlined style={{ fontSize: '8px'}} />}
             onClick={handleIncrease}
             style={{
               display: 'flex',
@@ -162,8 +162,8 @@ const OrderItemComponent: React.FC<OrderItemComponentProps> = ({
               height: '22px',
               borderRadius: '50%',
               padding: 0,
-              background: '#1890ff',
-              borderColor: '#1890ff',
+              background: '#1A72DD',
+              borderColor: '#1A72DD',
             }}
           />
         </div>
@@ -173,7 +173,7 @@ const OrderItemComponent: React.FC<OrderItemComponentProps> = ({
       <div
         style={{
           fontSize: '16px',
-          fontWeight: '600',
+          fontWeight: '500',
           color: '#0088FF',
           minWidth: '90px',
           textAlign: 'right',
